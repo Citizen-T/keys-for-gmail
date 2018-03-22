@@ -7,6 +7,10 @@
         return matches(target, "ancestor-or-self::node()[@selector='all' and @role='menuitem']");
     }
 
+    function isSelectNoneButton(target) {
+        return matches(target, "ancestor-or-self::node()[@selector='none' and @role='menuitem']");
+    }
+
     function matches(target, xPath) {
         return document.evaluate(xPath, target, null, XPathResult.ANY_TYPE, null).iterateNext() !== null;
     }
@@ -23,6 +27,9 @@
         } else if (isSelectAllButton(event.target)) {
             console.log("clicked: Select All");
             alert('Try "* + a" to select all.');
+        } else if (isSelectNoneButton(event.target)) {
+            console.log("clicked: Select None");
+            alert('Try "* + n" to select none.');
         }
     });
 })();
