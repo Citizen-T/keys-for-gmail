@@ -3,6 +3,10 @@
         return matches(target, "ancestor::node()[@role='button' and @data-tooltip='Refresh']");
     }
 
+    function isSelectAllButton(target) {
+        return matches(target, "ancestor-or-self::node()[@selector='all' and @role='menuitem']");
+    }
+
     function matches(target, xPath) {
         return document.evaluate(xPath, target, null, XPathResult.ANY_TYPE, null).iterateNext() !== null;
     }
@@ -16,6 +20,9 @@
             console.log("clicked: Refresh");
             if (isViewingInbox(window.location))
                 alert('Try "g + i" to refresh your inbox.');
+        } else if (isSelectAllButton(event.target)) {
+            console.log("clicked: Select All");
+            alert('Try "* + a" to select all.');
         }
     });
 })();
