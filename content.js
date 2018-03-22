@@ -23,6 +23,10 @@
         return matches(target, "ancestor-or-self::node()[@selector='starred' and @role='menuitem']");
     }
 
+    function isSelectUnstarredButton(target) {
+        return matches(target, "ancestor-or-self::node()[@selector='unstarred' and @role='menuitem']");
+    }
+
     function matches(target, xPath) {
         return document.evaluate(xPath, target, null, XPathResult.ANY_TYPE, null).iterateNext() !== null;
     }
@@ -51,6 +55,9 @@
         } else if (isSelectStarredButton(event.target)) {
             console.log("clicked: Select Starred");
             alert('Try "* + s" to select all starred.');
+        } else if (isSelectUnstarredButton(event.target)) {
+            console.log("clicked: Select Unstarred");
+            alert('Try "* + t" to select all unstarred.');
         }
     });
 })();
