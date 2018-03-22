@@ -15,6 +15,10 @@
         return matches(target, "ancestor-or-self::node()[@selector='read' and @role='menuitem']");
     }
 
+    function isSelectUnreadButton(target) {
+        return matches(target, "ancestor-or-self::node()[@selector='unread' and @role='menuitem']");
+    }
+
     function matches(target, xPath) {
         return document.evaluate(xPath, target, null, XPathResult.ANY_TYPE, null).iterateNext() !== null;
     }
@@ -37,6 +41,9 @@
         } else if (isSelectReadButton(event.target)) {
             console.log("clicked: Select Read");
             alert('Try "* + r" to select all read.');
+        } else if (isSelectUnreadButton(event.target)) {
+            console.log("clicked: Select Unread");
+            alert('Try "* + u" to select all unread.');
         }
     });
 })();
