@@ -11,6 +11,12 @@
                             alert('Try "g + i" to refresh your inbox.');
                     });
                     mutation.target.setAttribute('data-keys-is-listening', true);
+                } else if (isSelectAllButton(mutation.target)) {
+                    mutation.target.addEventListener("click", () => {
+                        console.log("clicked: Select All");
+                        alert('Try "* + a" to select all.');
+                    });
+                    mutation.target.setAttribute('data-keys-is-listening', true);
                 }
             }
         }
@@ -22,7 +28,7 @@
     }
 
     function isSelectAllButton(target) {
-        return matches(target, "ancestor-or-self::node()[@selector='all' and @role='menuitem']");
+        return matches(target, "self::node()[@selector='all' and @role='menuitem']");
     }
 
     function isSelectNoneButton(target) {
@@ -54,10 +60,7 @@
     }
 
     document.addEventListener("click", (event) => {
-        if (isSelectAllButton(event.target)) {
-            console.log("clicked: Select All");
-            alert('Try "* + a" to select all.');
-        } else if (isSelectNoneButton(event.target)) {
+        if (isSelectNoneButton(event.target)) {
             console.log("clicked: Select None");
             alert('Try "* + n" to select none.');
         } else if (isSelectReadButton(event.target)) {
