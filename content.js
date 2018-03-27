@@ -1,6 +1,24 @@
 (function () {
+    let observer = new MutationObserver((mutations) => {
+        for (let mutation of mutations) {
+            if (mutation.type === 'attributes') {
+                if (mutation.target.getAttribute('data-keys-is-listening'))
+                    continue;
+                if (isRefreshButton(mutation.target)) {
+                    mutation.target.addEventListener("click", () => {
+                        console.log("clicked: Refresh");
+                        if (isViewingInbox(window.location))
+                            alert('Try "g + i" to refresh your inbox.');
+                    });
+                    mutation.target.setAttribute('data-keys-is-listening', true);
+                }
+            }
+        }
+    })
+    observer.observe(document, { childList: true, subtree: true, attributes: true });
+
     function isRefreshButton(target) {
-        return matches(target, "ancestor::node()[@role='button' and @data-tooltip='Refresh']");
+        return matches(target, "self::node()[@role='button' and @data-tooltip='Refresh']");
     }
 
     function isSelectAllButton(target) {
@@ -36,11 +54,7 @@
     }
 
     document.addEventListener("click", (event) => {
-        if (isRefreshButton(event.target)) {
-            console.log("clicked: Refresh");
-            if (isViewingInbox(window.location))
-                alert('Try "g + i" to refresh your inbox.');
-        } else if (isSelectAllButton(event.target)) {
+        if (isSelectAllButton(event.target)) {
             console.log("clicked: Select All");
             alert('Try "* + a" to select all.');
         } else if (isSelectNoneButton(event.target)) {
