@@ -1,6 +1,6 @@
 (function () {
     let loading = !isDoneLoading();
-    let mutationChain = new AlreadyListeningHandler(new RefreshButtonHandler(new SelectAllMenuItemHandler(new SelectNoneMenuItemHandler(new SelectReadMenuItemHandler(new SelectUnreadMenuItemHandler(new SelectStarredMenuItemHandler(new UnhandledMutationHandler())))))));
+    let mutationChain = new AlreadyListeningHandler(new RefreshButtonHandler(new SelectAllMenuItemHandler(new SelectNoneMenuItemHandler(new SelectReadMenuItemHandler(new SelectUnreadMenuItemHandler(new SelectStarredMenuItemHandler(new SelectUnstarredMenuItemHandler(new UnhandledMutationHandler()))))))));
     let observer = new MutationObserver((mutations) => {
         if (loading && isDoneLoading())
             loading = false;
@@ -13,6 +13,11 @@
     function isDoneLoading() {
         return document.querySelector("#loading[style='display: none;']") !== null;
     }
+
+    function matches(target, xPath) {
+        return document.evaluate(xPath, target, null, XPathResult.ANY_TYPE, null).iterateNext() !== null;
+    }
+
 
     // AlreadyListeningHandler
     //
@@ -186,6 +191,31 @@
         return matches(target, "self::node()[@selector='starred' and @role='menuitem']");
     }
 
+    // SelectUnstarredMenuItemHandler
+    //
+    // Checks to see if the mutated element is the Select Unstarred menu item.  If it is, then a click listener is added to the menu item 
+    // and the 'data-keys-is-listening' attribute is set accordingly.  Otherwise, the mutation is passed to the next link in the 
+    // handler chain.
+    function SelectUnstarredMenuItemHandler(next) {
+        this.next = next;
+    }
+
+    SelectUnstarredMenuItemHandler.prototype.handle = function (mutation) {
+        if (!this._isSelectUnstarredMenuItem(mutation.target)) {
+            this.next.handle(mutation);
+        } else {
+            mutation.target.addEventListener("click", () => {
+                console.log("clicked: Select Unstarred");
+                alert('Try "* + t" to select all unstarred.');
+            });
+            mutation.target.setAttribute('data-keys-is-listening', true);
+        }
+    }
+
+    SelectUnstarredMenuItemHandler.prototype._isSelectUnstarredMenuItem = function (target) {
+        return matches(target, "self::node()[@selector='unstarred' and @role='menuitem']");
+    }
+
     // UnhandledMutationHandler
     //
     // Final link in the mutation chain.  This link handles any mutations that are not handled by any other link along the way.  This is 
@@ -197,21 +227,4 @@
     UnhandledMutationHandler.prototype.handle = function (mutation) {
         
     }
-
-
-
-    function isSelectUnstarredButton(target) {
-        return matches(target, "ancestor-or-self::node()[@selector='unstarred' and @role='menuitem']");
-    }
-
-    function matches(target, xPath) {
-        return document.evaluate(xPath, target, null, XPathResult.ANY_TYPE, null).iterateNext() !== null;
-    }
-
-    document.addEventListener("click", (event) => {
-        if (isSelectUnstarredButton(event.target)) {
-            console.log("clicked: Select Unstarred");
-            alert('Try "* + t" to select all unstarred.');
-        }
-    });
 })();
