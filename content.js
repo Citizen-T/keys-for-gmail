@@ -1,27 +1,100 @@
 (function () {
+    let loading = !isDoneLoading();
+    let mutationChain = new AlreadyListeningHandler(new RefreshButtonHandler(new SelectAllMenuItemHandler(new UnhandledMutationHandler())));
     let observer = new MutationObserver((mutations) => {
-        for (let mutation of mutations) {
-            if (mutation.type === 'attributes') {
-                if (mutation.target.getAttribute('data-keys-is-listening'))
-                    continue;
-                if (isRefreshButton(mutation.target)) {
-                    mutation.target.addEventListener("click", () => {
-                        console.log("clicked: Refresh");
-                        if (isViewingInbox(window.location))
-                            alert('Try "g + i" to refresh your inbox.');
-                    });
-                    mutation.target.setAttribute('data-keys-is-listening', true);
-                } else if (isSelectAllButton(mutation.target)) {
-                    mutation.target.addEventListener("click", () => {
-                        console.log("clicked: Select All");
-                        alert('Try "* + a" to select all.');
-                    });
-                    mutation.target.setAttribute('data-keys-is-listening', true);
-                }
+        if (loading) {
+            let l = !isDoneLoading();
+            if (l === false) {
+                loading = false;
+                console.log("done loading!");
             }
         }
-    })
+        if (!loading) {
+            mutations.forEach((m) => mutationChain.handle(m));
+        }
+    });
     observer.observe(document, { childList: true, subtree: true, attributes: true });
+
+
+    function isDoneLoading() {
+        return document.querySelector("#loading[style='display: none;']") !== null;
+    }
+
+    // AlreadyListeningHandler
+    //
+    // Checks to see if the mutated element is already being watched for clicks.  If it is, then no further processing is needed 
+    // if it is not, then the mutation is passed to the next link in the handler chain.
+    function AlreadyListeningHandler(next) {
+        this.next = next;
+    }
+
+    AlreadyListeningHandler.prototype.handle = function (mutation) {
+        if (!mutation.target.getAttribute('data-keys-is-listening'))
+            this.next.handle(mutation);
+    }
+
+    // RefreshButtonHandler
+    //
+    // Checks to see if the mutated element is the Refresh button.  If it is, then a click listener is added to the button and the 
+    // 'data-keys-is-listening' attribute is set accordingly.  Otherwise, the mutation is passed to the next link in the handler 
+    // chain.
+    function RefreshButtonHandler(next) {
+        this.next = next;
+    }
+
+    RefreshButtonHandler.prototype.handle = function (mutation) {
+        if (!isRefreshButton(mutation.target)) {
+            this.next.handle(mutation);
+        } else {
+            mutation.target.addEventListener("click", () => {
+                console.log("clicked: Refresh");
+                // if (isViewingInbox(window.location))
+                //     alert('Try "g + i" to refresh your inbox.');
+            });
+            mutation.target.setAttribute('data-keys-is-listening', true);
+        }
+    }
+
+    // SelectAllMenuItemHandler
+    //
+    // Checks to see if the mutated element is the Select All menu item.  If it is, then a click listener is added to the menu item 
+    // and the 'data-keys-is-listening' attribute is set accordingly.  Otherwise, the mutation is passed to the next link in the 
+    // handler chain.
+    function SelectAllMenuItemHandler(next) {
+        this.next = next;
+    }
+
+    SelectAllMenuItemHandler.prototype.handle = function (mutation) {
+        if (!isSelectAllButton(mutation.target)) {
+            this.next.handle(mutation);
+        } else {
+            mutation.target.addEventListener("click", () => {
+                console.log("clicked: Select All");
+                // alert('Try "* + a" to select all.');
+            });
+            mutation.target.setAttribute('data-keys-is-listening', true);
+        }
+    }
+
+
+    // UnhandledMutationHandler
+    //
+    // Final link in the mutation chain.  This link handles any mutations that are not handled by any other link along the way.  This is 
+    // mostly a placeholder as we are currently handling these mutations by doing nothing.
+    function UnhandledMutationHandler() {
+
+    }
+
+    UnhandledMutationHandler.prototype.handle = function (mutation) {
+        
+    }
+
+
+
+
+
+
+
 
     function isRefreshButton(target) {
         return matches(target, "self::node()[@role='button' and @data-tooltip='Refresh']");
