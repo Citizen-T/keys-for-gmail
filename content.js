@@ -1,6 +1,6 @@
 (function () {
     let loading = !isDoneLoading();
-    let mutationChain = new AlreadyListeningHandler(new RefreshButtonHandler(new SelectAllMenuItemHandler(new UnhandledMutationHandler())));
+    let mutationChain = new AlreadyListeningHandler(new RefreshButtonHandler(new SelectAllMenuItemHandler(new SelectNoneMenuItemHandler(new UnhandledMutationHandler()))));
     let observer = new MutationObserver((mutations) => {
         if (loading && isDoneLoading())
             loading = false;
@@ -83,6 +83,32 @@
     }
 
 
+    // SelectNoneMenuItemHandler
+    //
+    // Checks to see if the mutated element is the Select None menu item.  If it is, then a click listener is added to the menu item 
+    // and the 'data-keys-is-listening' attribute is set accordingly.  Otherwise, the mutation is passed to the next link in the 
+    // handler chain.
+    function SelectNoneMenuItemHandler(next) {
+        this.next = next;
+    }
+
+    SelectNoneMenuItemHandler.prototype.handle = function (mutation) {
+        if (!this._isSelectNoneButton(mutation.target)) {
+            this.next.handle(mutation);
+        } else {
+            mutation.target.addEventListener("click", () => {
+                console.log("clicked: Select None");
+                alert('Try "* + n" to select none.');
+            });
+            mutation.target.setAttribute('data-keys-is-listening', true);
+        }
+    }
+
+    SelectNoneMenuItemHandler.prototype._isSelectNoneButton = function (target) {
+        return matches(target, "self::node()[@selector='none' and @role='menuitem']");
+    }
+
+
     // UnhandledMutationHandler
     //
     // Final link in the mutation chain.  This link handles any mutations that are not handled by any other link along the way.  This is 
@@ -106,9 +132,6 @@
 
     
 
-    function isSelectNoneButton(target) {
-        return matches(target, "ancestor-or-self::node()[@selector='none' and @role='menuitem']");
-    }
 
     function isSelectReadButton(target) {
         return matches(target, "ancestor-or-self::node()[@selector='read' and @role='menuitem']");
@@ -131,10 +154,7 @@
     }
 
     document.addEventListener("click", (event) => {
-        if (isSelectNoneButton(event.target)) {
-            console.log("clicked: Select None");
-            alert('Try "* + n" to select none.');
-        } else if (isSelectReadButton(event.target)) {
+        if (isSelectReadButton(event.target)) {
             console.log("clicked: Select Read");
             alert('Try "* + r" to select all read.');
         } else if (isSelectUnreadButton(event.target)) {
