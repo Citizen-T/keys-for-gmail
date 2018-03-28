@@ -1,6 +1,6 @@
 (function () {
     let loading = !isDoneLoading();
-    let mutationChain = new AlreadyListeningHandler(new RefreshButtonHandler(new SelectAllMenuItemHandler(new SelectNoneMenuItemHandler(new UnhandledMutationHandler()))));
+    let mutationChain = new AlreadyListeningHandler(new RefreshButtonHandler(new SelectAllMenuItemHandler(new SelectNoneMenuItemHandler(new SelectReadMenuItemHandler(new UnhandledMutationHandler())))));
     let observer = new MutationObserver((mutations) => {
         if (loading && isDoneLoading())
             loading = false;
@@ -109,6 +109,32 @@
     }
 
 
+    // SelectReadMenuItemHandler
+    // 
+    // Checks to see if the mutated element is the Select Read menu item.  If it is, then a click listener is added to the menu item 
+    // and the 'data-keys-is-listening' attribute is set accordingly.  Otherwise, the mutation is passed to the next link in the 
+    // handler chain.
+    function SelectReadMenuItemHandler(next) {
+        this.next = next;
+    }
+
+    SelectReadMenuItemHandler.prototype.handle = function (mutation) {
+        if (!this._isSelectReadMenuItem(mutation.target)) {
+            this.next.handle(mutation);
+        } else {
+            mutation.target.addEventListener("click", () => {
+                console.log("clicked: Select Read");
+                alert('Try "* + r" to select all read.');
+            });
+            mutation.target.setAttribute('data-keys-is-listening', true);
+        }
+    }
+
+    SelectReadMenuItemHandler.prototype._isSelectReadMenuItem = function (target) {
+        return matches(target, "self::node()[@selector='read' and @role='menuitem']");
+    }
+
+
     // UnhandledMutationHandler
     //
     // Final link in the mutation chain.  This link handles any mutations that are not handled by any other link along the way.  This is 
@@ -133,10 +159,6 @@
     
 
 
-    function isSelectReadButton(target) {
-        return matches(target, "ancestor-or-self::node()[@selector='read' and @role='menuitem']");
-    }
-
     function isSelectUnreadButton(target) {
         return matches(target, "ancestor-or-self::node()[@selector='unread' and @role='menuitem']");
     }
@@ -154,10 +176,7 @@
     }
 
     document.addEventListener("click", (event) => {
-        if (isSelectReadButton(event.target)) {
-            console.log("clicked: Select Read");
-            alert('Try "* + r" to select all read.');
-        } else if (isSelectUnreadButton(event.target)) {
+        if (isSelectUnreadButton(event.target)) {
             console.log("clicked: Select Unread");
             alert('Try "* + u" to select all unread.');
         } else if (isSelectStarredButton(event.target)) {
