@@ -42,8 +42,8 @@
         } else {
             mutation.target.addEventListener("click", () => {
                 console.log("clicked: Refresh");
-                // if (isViewingInbox(window.location))
-                //     alert('Try "g + i" to refresh your inbox.');
+                if (this._isViewingInbox(window.location))
+                    alert('Try "g + i" to refresh your inbox.');
             });
             mutation.target.setAttribute('data-keys-is-listening', true);
         }
@@ -51,6 +51,10 @@
 
     RefreshButtonHandler.prototype._isRefreshButton = function (target) {
         return matches(target, "self::node()[@role='button' and @data-tooltip='Refresh']");
+    }
+
+    RefreshButtonHandler.prototype._isViewingInbox = function (location) {
+        return location.hash === '#inbox';
     }
 
     // SelectAllMenuItemHandler
@@ -124,10 +128,6 @@
 
     function matches(target, xPath) {
         return document.evaluate(xPath, target, null, XPathResult.ANY_TYPE, null).iterateNext() !== null;
-    }
-
-    function isViewingInbox(location) {
-        return location.hash === '#inbox';
     }
 
     document.addEventListener("click", (event) => {
