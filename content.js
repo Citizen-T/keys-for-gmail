@@ -43,7 +43,7 @@
     }
 
     RefreshButtonHandler.prototype.handle = function (mutation) {
-        if (!isRefreshButton(mutation.target)) {
+        if (!this._isRefreshButton(mutation.target)) {
             this.next.handle(mutation);
         } else {
             mutation.target.addEventListener("click", () => {
@@ -53,6 +53,10 @@
             });
             mutation.target.setAttribute('data-keys-is-listening', true);
         }
+    }
+
+    RefreshButtonHandler.prototype._isRefreshButton = function (target) {
+        return matches(target, "self::node()[@role='button' and @data-tooltip='Refresh']");
     }
 
     // SelectAllMenuItemHandler
@@ -96,9 +100,7 @@
 
 
 
-    function isRefreshButton(target) {
-        return matches(target, "self::node()[@role='button' and @data-tooltip='Refresh']");
-    }
+    
 
     function isSelectAllButton(target) {
         return matches(target, "self::node()[@selector='all' and @role='menuitem']");
