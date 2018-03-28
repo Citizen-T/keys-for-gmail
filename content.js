@@ -72,7 +72,7 @@
         } else {
             mutation.target.addEventListener("click", () => {
                 console.log("clicked: Select All");
-                // alert('Try "* + a" to select all.');
+                alert('Try "* + a" to select all.');
             });
             mutation.target.setAttribute('data-keys-is-listening', true);
         }
