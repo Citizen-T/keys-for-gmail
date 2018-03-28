@@ -69,7 +69,7 @@
     }
 
     SelectAllMenuItemHandler.prototype.handle = function (mutation) {
-        if (!isSelectAllButton(mutation.target)) {
+        if (!this._isSelectAllButton(mutation.target)) {
             this.next.handle(mutation);
         } else {
             mutation.target.addEventListener("click", () => {
@@ -78,6 +78,10 @@
             });
             mutation.target.setAttribute('data-keys-is-listening', true);
         }
+    }
+
+    SelectAllMenuItemHandler.prototype._isSelectAllButton = function (target) {
+        return matches(target, "self::node()[@selector='all' and @role='menuitem']");
     }
 
 
@@ -102,9 +106,7 @@
 
     
 
-    function isSelectAllButton(target) {
-        return matches(target, "self::node()[@selector='all' and @role='menuitem']");
-    }
+    
 
     function isSelectNoneButton(target) {
         return matches(target, "ancestor-or-self::node()[@selector='none' and @role='menuitem']");
