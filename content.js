@@ -2,16 +2,10 @@
     let loading = !isDoneLoading();
     let mutationChain = new AlreadyListeningHandler(new RefreshButtonHandler(new SelectAllMenuItemHandler(new UnhandledMutationHandler())));
     let observer = new MutationObserver((mutations) => {
-        if (loading) {
-            let l = !isDoneLoading();
-            if (l === false) {
-                loading = false;
-                console.log("done loading!");
-            }
-        }
-        if (!loading) {
+        if (loading && isDoneLoading())
+            loading = false;
+        if (!loading)
             mutations.forEach((m) => mutationChain.handle(m));
-        }
     });
     observer.observe(document, { childList: true, subtree: true, attributes: true });
 
