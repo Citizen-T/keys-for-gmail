@@ -19,8 +19,14 @@
 
     }
 
-    Gmail.prototype.isLoading = function () {
-        return document.querySelector("#loading[style='display: none;']") === null;
+    Gmail.prototype = {
+        get refreshButton() {
+            return document.querySelector("[role='button'][data-tooltip='Refresh']");
+        },
+        
+        isLoading: function () {
+            return document.querySelector("#loading[style='display: none;']") === null;
+        }
     }
 
     // MutationChainFactory
@@ -54,11 +60,11 @@
     // chain.
     function RefreshButtonHandler(next) {
         this.next = next;
-        this.locator = new XPathLocator(document, "self::node()[@role='button' and @data-tooltip='Refresh']");
     }
 
     RefreshButtonHandler.prototype.handle = function (mutation) {
-        if (!this._isRefreshButton(mutation.target)) {
+        let gmail = new Gmail();
+        if (mutation.target !== gmail.refreshButton) {
             this.next.handle(mutation);
         } else {
             mutation.target.addEventListener("click", () => {
