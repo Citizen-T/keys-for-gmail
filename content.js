@@ -80,10 +80,6 @@
         }
     }
 
-    RefreshButtonHandler.prototype._isRefreshButton = function (target) {
-        return this.locator.matches(target);
-    }
-
     // SelectAllMenuItemHandler
     //
     // Checks to see if the mutated element is the Select All menu item.  If it is, then a click listener is added to the menu item 
