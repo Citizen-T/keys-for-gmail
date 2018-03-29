@@ -12,6 +12,18 @@
         return document.evaluate(xPath, target, null, XPathResult.ANY_TYPE, null).iterateNext() !== null;
     }
 
+    // XPathLocator
+    //
+    // Object for checking DOM nodes against XPath statements.
+    function XPathLocator(document, xPath) {
+        this.document = document;
+        this.xPath = xPath;
+    }
+
+    XPathLocator.prototype.matches = function (node) {
+        return this.document.evaluate(this.xPath, node, null, XPathResult.ANY_TYPE, null).iterateNext() !== null;
+    }
+
 
     // Gmail
     //
@@ -44,6 +56,7 @@
     // chain.
     function RefreshButtonHandler(next) {
         this.next = next;
+        this.locator = new XPathLocator(document, "self::node()[@role='button' and @data-tooltip='Refresh']");
     }
 
     RefreshButtonHandler.prototype.handle = function (mutation) {
@@ -60,7 +73,7 @@
     }
 
     RefreshButtonHandler.prototype._isRefreshButton = function (target) {
-        return matches(target, "self::node()[@role='button' and @data-tooltip='Refresh']");
+        return this.locator.matches(target);
     }
 
     RefreshButtonHandler.prototype._isViewingInbox = function (location) {
