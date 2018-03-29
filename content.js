@@ -23,6 +23,30 @@
         get refreshButton() {
             return document.querySelector("[role='button'][data-tooltip='Refresh']");
         },
+
+        get selectAllMenuItem() {
+            return document.querySelector("[selector='all'][role='menuitem']");
+        },
+
+        get selectNoneMenuItem() {
+            return document.querySelector("[selector='none'][role='menuitem']");
+        },
+
+        get selectReadMenuItem() {
+            return document.querySelector("[selector='read'][role='menuitem']");
+        },
+
+        get selectUnreadMenuItem() {
+            return document.querySelector("[selector='unread'][role='menuitem']");
+        },
+
+        get selectStarredMenuItem() {
+            return document.querySelector("[selector='starred'][role='menuitem']");
+        },
+
+        get selectUnstarredMenuItem() {
+            return document.querySelector("[selector='unstarred'][role='menuitem']");
+        },
         
         isLoading: function () {
             return document.querySelector("#loading[style='display: none;']") === null;
@@ -87,11 +111,11 @@
     // handler chain.
     function SelectAllMenuItemHandler(next) {
         this.next = next;
-        this.locator = new XPathLocator(document, "self::node()[@selector='all' and @role='menuitem']");
     }
 
     SelectAllMenuItemHandler.prototype.handle = function (mutation) {
-        if (!this._isSelectAllButton(mutation.target)) {
+        let gmail = new Gmail();
+        if (mutation.target !== gmail.selectAllMenuItem) {
             this.next.handle(mutation);
         } else {
             mutation.target.addEventListener("click", () => {
@@ -102,10 +126,6 @@
         }
     }
 
-    SelectAllMenuItemHandler.prototype._isSelectAllButton = function (target) {
-        return this.locator.matches(target);
-    }
-
 
     // SelectNoneMenuItemHandler
     //
@@ -114,11 +134,11 @@
     // handler chain.
     function SelectNoneMenuItemHandler(next) {
         this.next = next;
-        this.locator = new XPathLocator(document, "self::node()[@selector='none' and @role='menuitem']");
     }
 
     SelectNoneMenuItemHandler.prototype.handle = function (mutation) {
-        if (!this._isSelectNoneButton(mutation.target)) {
+        let gmail = new Gmail();
+        if (mutation.target !== gmail.selectNoneMenuItem) {
             this.next.handle(mutation);
         } else {
             mutation.target.addEventListener("click", () => {
@@ -129,10 +149,6 @@
         }
     }
 
-    SelectNoneMenuItemHandler.prototype._isSelectNoneButton = function (target) {
-        return this.locator.matches(target);
-    }
-
 
     // SelectReadMenuItemHandler
     // 
@@ -141,11 +157,11 @@
     // handler chain.
     function SelectReadMenuItemHandler(next) {
         this.next = next;
-        this.locator = new XPathLocator(document, "self::node()[@selector='read' and @role='menuitem']");
     }
 
     SelectReadMenuItemHandler.prototype.handle = function (mutation) {
-        if (!this._isSelectReadMenuItem(mutation.target)) {
+        let gmail = new Gmail();
+        if (mutation.target !== gmail.selectReadMenuItem) {
             this.next.handle(mutation);
         } else {
             mutation.target.addEventListener("click", () => {
@@ -156,10 +172,6 @@
         }
     }
 
-    SelectReadMenuItemHandler.prototype._isSelectReadMenuItem = function (target) {
-        return this.locator.matches(target);
-    }
-
 
     // SelectUnreadMenuItemHandler
     // 
@@ -168,11 +180,11 @@
     // handler chain.
     function SelectUnreadMenuItemHandler(next) {
         this.next = next;
-        this.locator = new XPathLocator(document, "self::node()[@selector='unread' and @role='menuitem']");
     }
 
     SelectUnreadMenuItemHandler.prototype.handle = function (mutation) {
-        if (!this._isSelectUnreadMenuItem(mutation.target)) {
+        let gmail = new Gmail();
+        if (mutation.target !== gmail.selectUnreadMenuItem) {
             this.next.handle(mutation);
         } else {
             mutation.target.addEventListener("click", () => {
@@ -183,10 +195,6 @@
         }
     }
 
-    SelectUnreadMenuItemHandler.prototype._isSelectUnreadMenuItem = function (target) {
-        return this.locator.matches(target);
-    }
-
 
     // SelectStarredMenuItemHandler
     //
@@ -195,11 +203,11 @@
     // handler chain.
     function SelectStarredMenuItemHandler(next) {
         this.next = next;
-        this.locator = new XPathLocator(document, "self::node()[@selector='starred' and @role='menuitem']");
     }
 
     SelectStarredMenuItemHandler.prototype.handle = function (mutation) {
-        if (!this._isSelectStarredMenuItem(mutation.target)) {
+        let gmail = new Gmail();
+        if (mutation.target !== gmail.selectStarredMenuItem) {
             this.next.handle(mutation);
         } else {
             mutation.target.addEventListener("click", () => {
@@ -210,10 +218,6 @@
         }
     }
 
-    SelectStarredMenuItemHandler.prototype._isSelectStarredMenuItem = function (target) {
-        return this.locator.matches(target);
-    }
-
     // SelectUnstarredMenuItemHandler
     //
     // Checks to see if the mutated element is the Select Unstarred menu item.  If it is, then a click listener is added to the menu item 
@@ -221,11 +225,11 @@
     // handler chain.
     function SelectUnstarredMenuItemHandler(next) {
         this.next = next;
-        this.locator = new XPathLocator(document, "self::node()[@selector='unstarred' and @role='menuitem']");
     }
 
     SelectUnstarredMenuItemHandler.prototype.handle = function (mutation) {
-        if (!this._isSelectUnstarredMenuItem(mutation.target)) {
+        let gmail = new Gmail();
+        if (mutation.target !== gmail.selectUnstarredMenuItem) {
             this.next.handle(mutation);
         } else {
             mutation.target.addEventListener("click", () => {
@@ -234,10 +238,6 @@
             });
             mutation.target.setAttribute('data-keys-is-listening', true);
         }
-    }
-
-    SelectUnstarredMenuItemHandler.prototype._isSelectUnstarredMenuItem = function (target) {
-        return this.locator.matches(target);
     }
 
     // UnhandledMutationHandler
