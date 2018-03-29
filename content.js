@@ -1,10 +1,8 @@
 (function () {
-    let loading = !isDoneLoading();
+    let gmail = new Gmail();
     let mutationChain = new AlreadyListeningHandler(new RefreshButtonHandler(new SelectAllMenuItemHandler(new SelectNoneMenuItemHandler(new SelectReadMenuItemHandler(new SelectUnreadMenuItemHandler(new SelectStarredMenuItemHandler(new SelectUnstarredMenuItemHandler(new UnhandledMutationHandler()))))))));
     let observer = new MutationObserver((mutations) => {
-        if (loading && isDoneLoading())
-            loading = false;
-        if (!loading)
+        if (gmail.isDoneLoading())
             mutations.forEach((m) => mutationChain.handle(m));
     });
     observer.observe(document, { childList: true, subtree: true, attributes: true });
@@ -18,6 +16,17 @@
         return document.evaluate(xPath, target, null, XPathResult.ANY_TYPE, null).iterateNext() !== null;
     }
 
+
+    // Gmail
+    //
+    // A kind of "page object" that encapsulates some of the features of the Gmail app in easy to read and understand methods.
+    function Gmail() {
+
+    }
+
+    Gmail.prototype.isDoneLoading = function () {
+        return document.querySelector("#loading[style='display: none;']") !== null;
+    }
 
     // AlreadyListeningHandler
     //
