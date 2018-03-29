@@ -8,10 +8,6 @@
     observer.observe(document, { childList: true, subtree: true, attributes: true });
 
 
-    function matches(target, xPath) {
-        return document.evaluate(xPath, target, null, XPathResult.ANY_TYPE, null).iterateNext() !== null;
-    }
-
     // XPathLocator
     //
     // Object for checking DOM nodes against XPath statements.
@@ -87,6 +83,7 @@
     // handler chain.
     function SelectAllMenuItemHandler(next) {
         this.next = next;
+        this.locator = new XPathLocator(document, "self::node()[@selector='all' and @role='menuitem']");
     }
 
     SelectAllMenuItemHandler.prototype.handle = function (mutation) {
@@ -102,7 +99,7 @@
     }
 
     SelectAllMenuItemHandler.prototype._isSelectAllButton = function (target) {
-        return matches(target, "self::node()[@selector='all' and @role='menuitem']");
+        return this.locator.matches(target);
     }
 
 
@@ -113,6 +110,7 @@
     // handler chain.
     function SelectNoneMenuItemHandler(next) {
         this.next = next;
+        this.locator = new XPathLocator(document, "self::node()[@selector='none' and @role='menuitem']");
     }
 
     SelectNoneMenuItemHandler.prototype.handle = function (mutation) {
@@ -128,7 +126,7 @@
     }
 
     SelectNoneMenuItemHandler.prototype._isSelectNoneButton = function (target) {
-        return matches(target, "self::node()[@selector='none' and @role='menuitem']");
+        return this.locator.matches(target);
     }
 
 
@@ -139,6 +137,7 @@
     // handler chain.
     function SelectReadMenuItemHandler(next) {
         this.next = next;
+        this.locator = new XPathLocator(document, "self::node()[@selector='read' and @role='menuitem']");
     }
 
     SelectReadMenuItemHandler.prototype.handle = function (mutation) {
@@ -154,7 +153,7 @@
     }
 
     SelectReadMenuItemHandler.prototype._isSelectReadMenuItem = function (target) {
-        return matches(target, "self::node()[@selector='read' and @role='menuitem']");
+        return this.locator.matches(target);
     }
 
 
@@ -165,6 +164,7 @@
     // handler chain.
     function SelectUnreadMenuItemHandler(next) {
         this.next = next;
+        this.locator = new XPathLocator(document, "self::node()[@selector='unread' and @role='menuitem']");
     }
 
     SelectUnreadMenuItemHandler.prototype.handle = function (mutation) {
@@ -180,7 +180,7 @@
     }
 
     SelectUnreadMenuItemHandler.prototype._isSelectUnreadMenuItem = function (target) {
-        return matches(target, "self::node()[@selector='unread' and @role='menuitem']");
+        return this.locator.matches(target);
     }
 
 
@@ -191,6 +191,7 @@
     // handler chain.
     function SelectStarredMenuItemHandler(next) {
         this.next = next;
+        this.locator = new XPathLocator(document, "self::node()[@selector='starred' and @role='menuitem']");
     }
 
     SelectStarredMenuItemHandler.prototype.handle = function (mutation) {
@@ -206,7 +207,7 @@
     }
 
     SelectStarredMenuItemHandler.prototype._isSelectStarredMenuItem = function (target) {
-        return matches(target, "self::node()[@selector='starred' and @role='menuitem']");
+        return this.locator.matches(target);
     }
 
     // SelectUnstarredMenuItemHandler
@@ -216,6 +217,7 @@
     // handler chain.
     function SelectUnstarredMenuItemHandler(next) {
         this.next = next;
+        this.locator = new XPathLocator(document, "self::node()[@selector='unstarred' and @role='menuitem']");
     }
 
     SelectUnstarredMenuItemHandler.prototype.handle = function (mutation) {
@@ -231,7 +233,7 @@
     }
 
     SelectUnstarredMenuItemHandler.prototype._isSelectUnstarredMenuItem = function (target) {
-        return matches(target, "self::node()[@selector='unstarred' and @role='menuitem']");
+        return this.locator.matches(target);
     }
 
     // UnhandledMutationHandler
