@@ -23,6 +23,17 @@
         return document.querySelector("#loading[style='display: none;']") === null;
     }
 
+    // MutationChainFactory
+    // 
+    // Creates the mutation handler chain
+    function MutationChainFactory() {
+
+    }
+    
+    MutationChainFactory.prototype.make = function () {
+        return new AlreadyListeningHandler(new RefreshButtonHandler(new SelectAllMenuItemHandler(new SelectNoneMenuItemHandler(new SelectReadMenuItemHandler(new SelectUnreadMenuItemHandler(new SelectStarredMenuItemHandler(new SelectUnstarredMenuItemHandler(new UnhandledMutationHandler()))))))));
+    }
+
     // AlreadyListeningHandler
     //
     // Checks to see if the mutated element is already being watched for clicks.  If it is, then no further processing is needed 
@@ -241,7 +252,7 @@
 
     // main
     let gmail = new Gmail();
-    let mutationChain = new AlreadyListeningHandler(new RefreshButtonHandler(new SelectAllMenuItemHandler(new SelectNoneMenuItemHandler(new SelectReadMenuItemHandler(new SelectUnreadMenuItemHandler(new SelectStarredMenuItemHandler(new SelectUnstarredMenuItemHandler(new UnhandledMutationHandler()))))))));
+    let mutationChain = new MutationChainFactory().make();
     let observer = new MutationObserver((mutations) => {
         if (!gmail.isLoading())
             mutations.forEach((m) => mutationChain.handle(m));
