@@ -1,17 +1,4 @@
 (function () {
-    // XPathLocator
-    //
-    // Object for checking DOM nodes against XPath statements.
-    function XPathLocator(document, xPath) {
-        this.document = document;
-        this.xPath = xPath;
-    }
-
-    XPathLocator.prototype.matches = function (node) {
-        return this.document.evaluate(this.xPath, node, null, XPathResult.ANY_TYPE, null).iterateNext() !== null;
-    }
-
-
     // Gmail
     //
     // A kind of "page object" that encapsulates some of the features of the Gmail app in easy to read and understand methods.
