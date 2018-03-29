@@ -2,15 +2,11 @@
     let gmail = new Gmail();
     let mutationChain = new AlreadyListeningHandler(new RefreshButtonHandler(new SelectAllMenuItemHandler(new SelectNoneMenuItemHandler(new SelectReadMenuItemHandler(new SelectUnreadMenuItemHandler(new SelectStarredMenuItemHandler(new SelectUnstarredMenuItemHandler(new UnhandledMutationHandler()))))))));
     let observer = new MutationObserver((mutations) => {
-        if (gmail.isDoneLoading())
+        if (!gmail.isLoading())
             mutations.forEach((m) => mutationChain.handle(m));
     });
     observer.observe(document, { childList: true, subtree: true, attributes: true });
 
-
-    function isDoneLoading() {
-        return document.querySelector("#loading[style='display: none;']") !== null;
-    }
 
     function matches(target, xPath) {
         return document.evaluate(xPath, target, null, XPathResult.ANY_TYPE, null).iterateNext() !== null;
@@ -24,8 +20,8 @@
 
     }
 
-    Gmail.prototype.isDoneLoading = function () {
-        return document.querySelector("#loading[style='display: none;']") !== null;
+    Gmail.prototype.isLoading = function () {
+        return document.querySelector("#loading[style='display: none;']") === null;
     }
 
     // AlreadyListeningHandler
