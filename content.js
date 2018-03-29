@@ -26,6 +26,10 @@
         
         isLoading: function () {
             return document.querySelector("#loading[style='display: none;']") === null;
+        },
+
+        isViewingInbox: function () {
+            return window.location.hash === '#inbox';
         }
     }
 
@@ -69,7 +73,7 @@
         } else {
             mutation.target.addEventListener("click", () => {
                 console.log("clicked: Refresh");
-                if (this._isViewingInbox(window.location))
+                if (gmail.isViewingInbox())
                     alert('Try "g + i" to refresh your inbox.');
             });
             mutation.target.setAttribute('data-keys-is-listening', true);
@@ -78,10 +82,6 @@
 
     RefreshButtonHandler.prototype._isRefreshButton = function (target) {
         return this.locator.matches(target);
-    }
-
-    RefreshButtonHandler.prototype._isViewingInbox = function (location) {
-        return location.hash === '#inbox';
     }
 
     // SelectAllMenuItemHandler
