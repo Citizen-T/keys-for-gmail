@@ -1,13 +1,4 @@
 (function () {
-    let gmail = new Gmail();
-    let mutationChain = new AlreadyListeningHandler(new RefreshButtonHandler(new SelectAllMenuItemHandler(new SelectNoneMenuItemHandler(new SelectReadMenuItemHandler(new SelectUnreadMenuItemHandler(new SelectStarredMenuItemHandler(new SelectUnstarredMenuItemHandler(new UnhandledMutationHandler()))))))));
-    let observer = new MutationObserver((mutations) => {
-        if (!gmail.isLoading())
-            mutations.forEach((m) => mutationChain.handle(m));
-    });
-    observer.observe(document, { childList: true, subtree: true, attributes: true });
-
-
     // XPathLocator
     //
     // Object for checking DOM nodes against XPath statements.
@@ -247,4 +238,13 @@
     UnhandledMutationHandler.prototype.handle = function (mutation) {
         
     }
+
+    // main
+    let gmail = new Gmail();
+    let mutationChain = new AlreadyListeningHandler(new RefreshButtonHandler(new SelectAllMenuItemHandler(new SelectNoneMenuItemHandler(new SelectReadMenuItemHandler(new SelectUnreadMenuItemHandler(new SelectStarredMenuItemHandler(new SelectUnstarredMenuItemHandler(new UnhandledMutationHandler()))))))));
+    let observer = new MutationObserver((mutations) => {
+        if (!gmail.isLoading())
+            mutations.forEach((m) => mutationChain.handle(m));
+    });
+    observer.observe(document, { childList: true, subtree: true, attributes: true });
 })();
