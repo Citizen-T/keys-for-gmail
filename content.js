@@ -135,7 +135,6 @@
 
     RefreshButtonHandler.prototype._handle = function (mutation) {
         mutation.target.addEventListener("click", () => {
-            console.log("clicked: Refresh");
             if (this._gmail.isViewingInbox())
                 alert('Try "g + i" to refresh your inbox.');
         });
@@ -160,7 +159,6 @@
 
     SelectAllMenuItemHandler.prototype._handle = function (mutation) {
         mutation.target.addEventListener("click", () => {
-            console.log("clicked: Select All");
             alert('Try "* + a" to select all.');
         });
         mutation.target.setAttribute('data-keys-is-listening', true);
@@ -185,7 +183,6 @@
 
     SelectNoneMenuItemHandler.prototype._handle = function (mutation) {
         mutation.target.addEventListener("click", () => {
-            console.log("clicked: Select None");
             alert('Try "* + n" to select none.');
         });
         mutation.target.setAttribute('data-keys-is-listening', true);
@@ -210,7 +207,6 @@
 
     SelectReadMenuItemHandler.prototype._handle = function (mutation) {
         mutation.target.addEventListener("click", () => {
-            console.log("clicked: Select Read");
             alert('Try "* + r" to select all read.');
         });
         mutation.target.setAttribute('data-keys-is-listening', true);
@@ -235,7 +231,6 @@
 
     SelectUnreadMenuItemHandler.prototype._handle = function (mutation) {
         mutation.target.addEventListener("click", () => {
-            console.log("clicked: Select Unread");
             alert('Try "* + u" to select all unread.');
         });
         mutation.target.setAttribute('data-keys-is-listening', true);
@@ -260,7 +255,6 @@
 
     SelectStarredMenuItemHandler.prototype._handle = function (mutation) {
         mutation.target.addEventListener("click", () => {
-            console.log("clicked: Select Starred");
             alert('Try "* + s" to select all starred.');
         });
         mutation.target.setAttribute('data-keys-is-listening', true);
@@ -285,7 +279,6 @@
 
     SelectUnstarredMenuItemHandler.prototype._handle = function (mutation) {
         mutation.target.addEventListener("click", () => {
-            console.log("clicked: Select Unstarred");
             alert('Try "* + t" to select all unstarred.');
         });
         mutation.target.setAttribute('data-keys-is-listening', true);
@@ -310,7 +303,6 @@
 
     InboxNavItemHandler.prototype._handle = function (mutation) {
         mutation.target.addEventListener("click", () => {
-            console.log("clicked: Inbox Nav Item");
             alert('Try "g + i" to go to inbox.');
         });
         mutation.target.setAttribute('data-keys-is-listening', true);
