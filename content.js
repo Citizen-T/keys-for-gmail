@@ -250,8 +250,8 @@
                     console.log("clicked: Inbox Nav Item");
                     alert('Try "g + i" to go to inbox.');
                 });
+                mutation.target.setAttribute('data-keys-is-listening', true);
             }
-            mutation.target.setAttribute('data-keys-is-listening', true);
         }
     }
 
