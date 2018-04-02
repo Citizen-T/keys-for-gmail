@@ -11,6 +11,10 @@
             return document.querySelector("[role='button'][data-tooltip='Refresh']");
         },
 
+        get selectAllCheckbox() {
+            return document.querySelector("div[data-rowlist-toolbar='true'] span[role='checkbox']");
+        },
+
         get selectAllMenuItem() {
             return document.querySelector("[selector='all'][role='menuitem']");
         },
@@ -56,7 +60,8 @@
     }
 
     MutationChainFactory.prototype.make = function () {
-        let inboxNavItem = new InboxNavItemHandler(this._gmail);
+        let selectAllCheckbox = new SelectAllCheckboxHandler(this._gmail);
+        let inboxNavItem = new InboxNavItemHandler(this._gmail, selectAllCheckbox);
         let selectUnstarredMenuItem = new SelectUnstarredMenuItemHandler(this._gmail, inboxNavItem);
         let selectStarredMenuItem = new SelectStarredMenuItemHandler(this._gmail, selectUnstarredMenuItem);
         let selectUnreadmenuItem = new SelectUnreadMenuItemHandler(this._gmail, selectStarredMenuItem);
@@ -304,6 +309,34 @@
     InboxNavItemHandler.prototype._handle = function (mutation) {
         mutation.target.addEventListener("click", () => {
             alert('Try "g + i" to go to inbox.');
+        });
+        mutation.target.setAttribute('data-keys-is-listening', true);
+    }
+
+
+    // SelectAllCheckboxHandler
+    //
+    // Checks to see if the mutated element is the Select All checkbox.  If it is, then a click listener is added to the checkbox 
+    // and the 'data-keys-is-listening' attribute is set accordingly.  Otherwise, the mutation is passed to the next link in the 
+    // handler chain.
+    function SelectAllCheckboxHandler(gmail, next) {
+        ChainLink.call(this, next);
+        this._gmail = gmail;
+    }
+
+    SelectAllCheckboxHandler.prototype = Object.create(ChainLink.prototype);
+
+    SelectAllCheckboxHandler.prototype._canHandle = function (mutation) {
+        return mutation.target === this._gmail.selectAllCheckbox;
+    }
+
+    SelectAllCheckboxHandler.prototype._handle = function (mutation) {
+        mutation.target.addEventListener("click", (event) => {
+            if (mutation.target.getAttribute('aria-checked') === "true") {
+                alert('Try "* + a" to select all.');
+            } else {
+                alert('Try "* + n" to select none.');
+            }
         });
         mutation.target.setAttribute('data-keys-is-listening', true);
     }
