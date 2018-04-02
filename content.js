@@ -67,18 +67,18 @@
     // next
     //   The next ChainLink in this Chain of Responsibility
     function ChainLink(next) {
-        this.next = next;
+        this._next = next;
     }
 
     ChainLink.prototype = {
-        next: undefined,
+        _next: undefined,
 
         handle: function (mutation) {
             if (this._canHandle(mutation)) {
                 this._handle(mutation);
             } else {
-                if (this.next)
-                    this.next.handle(mutation);
+                if (this._next)
+                    this._next.handle(mutation);
             }
         },
 
