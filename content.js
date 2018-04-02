@@ -56,7 +56,16 @@
     }
 
     MutationChainFactory.prototype.make = function () {
-        return new AlreadyListeningHandler(new RefreshButtonHandler(new SelectAllMenuItemHandler(new SelectNoneMenuItemHandler(new SelectReadMenuItemHandler(new SelectUnreadMenuItemHandler(new SelectStarredMenuItemHandler(new SelectUnstarredMenuItemHandler(new InboxNavItemHandler(new UnhandledMutationHandler())))))))));
+        let gmail = new Gmail();
+        let inboxNavItem = new InboxNavItemHandler(gmail);
+        let selectUnstarredMenuItem = new SelectUnstarredMenuItemHandler(gmail, inboxNavItem);
+        let selectStarredMenuItem = new SelectStarredMenuItemHandler(gmail, selectUnstarredMenuItem);
+        let selectUnreadmenuItem = new SelectUnreadMenuItemHandler(gmail, selectStarredMenuItem);
+        let selectReadMenuItem = new SelectReadMenuItemHandler(gmail, selectUnreadmenuItem);
+        let selectNoneMenuItem = new SelectNoneMenuItemHandler(gmail, selectReadMenuItem);
+        let selectAllMenuItem = new SelectAllMenuItemHandler(gmail, selectNoneMenuItem);
+        let refreshButton = new RefreshButtonHandler(gmail, selectAllMenuItem);
+        return new AlreadyListeningHandler(gmail, refreshButton);
     }
 
     // ChainLink
@@ -66,11 +75,13 @@
     //
     // next
     //   The next ChainLink in this Chain of Responsibility
-    function ChainLink(next) {
+    function ChainLink(gmail, next) {
+        this._gmail = gmail;
         this._next = next;
     }
 
     ChainLink.prototype = {
+        _gmail: undefined,
         _next: undefined,
 
         handle: function (mutation) {
@@ -95,8 +106,8 @@
     //
     // Checks to see if the mutated element is already being watched for clicks.  If it is, then no further processing is needed 
     // if it is not, then the mutation is passed to the next link in the handler chain.
-    function AlreadyListeningHandler(next) {
-        ChainLink.call(this, next);
+    function AlreadyListeningHandler(gmail, next) {
+        ChainLink.call(this, gmail, next);
     }
 
     AlreadyListeningHandler.prototype = Object.create(ChainLink.prototype);
@@ -114,22 +125,20 @@
     // Checks to see if the mutated element is the Refresh button.  If it is, then a click listener is added to the button and the 
     // 'data-keys-is-listening' attribute is set accordingly.  Otherwise, the mutation is passed to the next link in the handler 
     // chain.
-    function RefreshButtonHandler(next) {
-        ChainLink.call(this, next);
+    function RefreshButtonHandler(gmail, next) {
+        ChainLink.call(this, gmail, next);
     }
 
     RefreshButtonHandler.prototype = Object.create(ChainLink.prototype);
 
     RefreshButtonHandler.prototype._canHandle = function (mutation) {
-        let gmail = new Gmail();
-        return mutation.target === gmail.refreshButton;
+        return mutation.target === this._gmail.refreshButton;
     }
 
     RefreshButtonHandler.prototype._handle = function (mutation) {
-        let gmail = new Gmail();
         mutation.target.addEventListener("click", () => {
             console.log("clicked: Refresh");
-            if (gmail.isViewingInbox())
+            if (this._gmail.isViewingInbox())
                 alert('Try "g + i" to refresh your inbox.');
         });
         mutation.target.setAttribute('data-keys-is-listening', true);
@@ -140,15 +149,14 @@
     // Checks to see if the mutated element is the Select All menu item.  If it is, then a click listener is added to the menu item 
     // and the 'data-keys-is-listening' attribute is set accordingly.  Otherwise, the mutation is passed to the next link in the 
     // handler chain.
-    function SelectAllMenuItemHandler(next) {
-        ChainLink.call(this, next);
+    function SelectAllMenuItemHandler(gmail, next) {
+        ChainLink.call(this, gmail, next);
     }
 
     SelectAllMenuItemHandler.prototype = Object.create(ChainLink.prototype);
 
     SelectAllMenuItemHandler.prototype._canHandle = function (mutation) {
-        let gmail = new Gmail();
-        return mutation.target === gmail.selectAllMenuItem
+        return mutation.target === this._gmail.selectAllMenuItem
     }
 
     SelectAllMenuItemHandler.prototype._handle = function (mutation) {
@@ -165,15 +173,14 @@
     // Checks to see if the mutated element is the Select None menu item.  If it is, then a click listener is added to the menu item 
     // and the 'data-keys-is-listening' attribute is set accordingly.  Otherwise, the mutation is passed to the next link in the 
     // handler chain.
-    function SelectNoneMenuItemHandler(next) {
-        ChainLink.call(this, next);
+    function SelectNoneMenuItemHandler(gmail, next) {
+        ChainLink.call(this, gmail, next);
     }
 
     SelectNoneMenuItemHandler.prototype = Object.create(ChainLink.prototype);
 
     SelectNoneMenuItemHandler.prototype._canHandle = function (mutation) {
-        let gmail = new Gmail();
-        return mutation.target === gmail.selectNoneMenuItem;
+        return mutation.target === this._gmail.selectNoneMenuItem;
     }
 
     SelectNoneMenuItemHandler.prototype._handle = function (mutation) {
@@ -190,15 +197,14 @@
     // Checks to see if the mutated element is the Select Read menu item.  If it is, then a click listener is added to the menu item 
     // and the 'data-keys-is-listening' attribute is set accordingly.  Otherwise, the mutation is passed to the next link in the 
     // handler chain.
-    function SelectReadMenuItemHandler(next) {
-        ChainLink.call(this, next);
+    function SelectReadMenuItemHandler(gmail, next) {
+        ChainLink.call(this, gmail, next);
     }
 
     SelectReadMenuItemHandler.prototype = Object.create(ChainLink.prototype);
 
     SelectReadMenuItemHandler.prototype._canHandle = function (mutation) {
-        let gmail = new Gmail();
-        return mutation.target === gmail.selectReadMenuItem;
+        return mutation.target === this._gmail.selectReadMenuItem;
     }
 
     SelectReadMenuItemHandler.prototype._handle = function (mutation) {
@@ -215,15 +221,14 @@
     // Checks to see if the mutated element is the Select Unread menu item.  If it is, then a click listener is added to the menu item 
     // and the 'data-keys-is-listening' attribute is set accordingly.  Otherwise, the mutation is passed to the next link in the 
     // handler chain.
-    function SelectUnreadMenuItemHandler(next) {
-        ChainLink.call(this, next);
+    function SelectUnreadMenuItemHandler(gmail, next) {
+        ChainLink.call(this, gmail, next);
     }
 
     SelectUnreadMenuItemHandler.prototype = Object.create(ChainLink.prototype);
 
     SelectUnreadMenuItemHandler.prototype._canHandle = function (mutation) {
-        let gmail = new Gmail();
-        return mutation.target === gmail.selectUnreadMenuItem;
+        return mutation.target === this._gmail.selectUnreadMenuItem;
     }
 
     SelectUnreadMenuItemHandler.prototype._handle = function (mutation) {
@@ -240,15 +245,14 @@
     // Checks to see if the mutated element is the Select Starred menu item.  If it is, then a click listener is added to the menu item 
     // and the 'data-keys-is-listening' attribute is set accordingly.  Otherwise, the mutation is passed to the next link in the 
     // handler chain.
-    function SelectStarredMenuItemHandler(next) {
-        ChainLink.call(this, next);
+    function SelectStarredMenuItemHandler(gmail, next) {
+        ChainLink.call(this, gmail, next);
     }
 
     SelectStarredMenuItemHandler.prototype = Object.create(ChainLink.prototype);
 
     SelectStarredMenuItemHandler.prototype._canHandle = function (mutation) {
-        let gmail = new Gmail();
-        return mutation.target === gmail.selectStarredMenuItem;
+        return mutation.target === this._gmail.selectStarredMenuItem;
     }
 
     SelectStarredMenuItemHandler.prototype._handle = function (mutation) {
@@ -265,15 +269,14 @@
     // Checks to see if the mutated element is the Select Unstarred menu item.  If it is, then a click listener is added to the menu item 
     // and the 'data-keys-is-listening' attribute is set accordingly.  Otherwise, the mutation is passed to the next link in the 
     // handler chain.
-    function SelectUnstarredMenuItemHandler(next) {
-        ChainLink.call(this, next);
+    function SelectUnstarredMenuItemHandler(gmail, next) {
+        ChainLink.call(this, gmail, next);
     }
 
     SelectUnstarredMenuItemHandler.prototype = Object.create(ChainLink.prototype);
 
     SelectUnstarredMenuItemHandler.prototype._canHandle = function (mutation) {
-        let gmail = new Gmail();
-        return mutation.target === gmail.selectUnstarredMenuItem;
+        return mutation.target === this._gmail.selectUnstarredMenuItem;
     }
 
     SelectUnstarredMenuItemHandler.prototype._handle = function (mutation) {
@@ -290,15 +293,14 @@
     // Checks to see if the mutated element is the Inbox navigation item.  If it is, then a click listener is added to the navigation item 
     // and the 'data-keys-is-listening' attribute is set accordingly.  Otherwise, the mutation is passed to the next link in the 
     // handler chain.
-    function InboxNavItemHandler(next) {
-        ChainLink.call(this, next);
+    function InboxNavItemHandler(gmail, next) {
+        ChainLink.call(this, gmail, next);
     }
 
     InboxNavItemHandler.prototype = Object.create(ChainLink.prototype);
 
     InboxNavItemHandler.prototype._canHandle = function (mutation) {
-        let gmail = new Gmail();
-        return mutation.target === gmail.inboxNavItem;
+        return mutation.target === this._gmail.inboxNavItem;
     }
 
     InboxNavItemHandler.prototype._handle = function (mutation) {
@@ -309,18 +311,6 @@
         mutation.target.setAttribute('data-keys-is-listening', true);
     }
 
-
-    // UnhandledMutationHandler
-    //
-    // Final link in the mutation chain.  This link handles any mutations that are not handled by any other link along the way.  This is 
-    // mostly a placeholder as we are currently handling these mutations by doing nothing.
-    function UnhandledMutationHandler() {
-
-    }
-
-    UnhandledMutationHandler.prototype.handle = function (mutation) {
-
-    }
 
     // main
     let gmail = new Gmail();
