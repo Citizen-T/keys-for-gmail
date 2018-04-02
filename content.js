@@ -266,21 +266,24 @@
     // and the 'data-keys-is-listening' attribute is set accordingly.  Otherwise, the mutation is passed to the next link in the 
     // handler chain.
     function SelectUnstarredMenuItemHandler(next) {
-        this.next = next;
+        ChainLink.call(this, next);
     }
 
-    SelectUnstarredMenuItemHandler.prototype.handle = function (mutation) {
+    SelectUnstarredMenuItemHandler.prototype = Object.create(ChainLink.prototype);
+
+    SelectUnstarredMenuItemHandler.prototype._canHandle = function (mutation) {
         let gmail = new Gmail();
-        if (mutation.target !== gmail.selectUnstarredMenuItem) {
-            this.next.handle(mutation);
-        } else {
-            mutation.target.addEventListener("click", () => {
-                console.log("clicked: Select Unstarred");
-                alert('Try "* + t" to select all unstarred.');
-            });
-            mutation.target.setAttribute('data-keys-is-listening', true);
-        }
+        return mutation.target === gmail.selectUnstarredMenuItem;
     }
+
+    SelectUnstarredMenuItemHandler.prototype._handle = function (mutation) {
+        mutation.target.addEventListener("click", () => {
+            console.log("clicked: Select Unstarred");
+            alert('Try "* + t" to select all unstarred.');
+        });
+        mutation.target.setAttribute('data-keys-is-listening', true);
+    }
+
 
     // InboxNavItemHandler
     // 
@@ -288,23 +291,24 @@
     // and the 'data-keys-is-listening' attribute is set accordingly.  Otherwise, the mutation is passed to the next link in the 
     // handler chain.
     function InboxNavItemHandler(next) {
-        this.next = next;
+        ChainLink.call(this, next);
     }
 
-    InboxNavItemHandler.prototype = {
-        handle: function (mutation) {
-            let gmail = new Gmail();
-            if (mutation.target !== gmail.inboxNavItem) {
-                this.next.handle(mutation);
-            } else {
-                mutation.target.addEventListener("click", () => {
-                    console.log("clicked: Inbox Nav Item");
-                    alert('Try "g + i" to go to inbox.');
-                });
-                mutation.target.setAttribute('data-keys-is-listening', true);
-            }
-        }
+    InboxNavItemHandler.prototype = Object.create(ChainLink.prototype);
+
+    InboxNavItemHandler.prototype._canHandle = function (mutation) {
+        let gmail = new Gmail();
+        return mutation.target === gmail.inboxNavItem;
     }
+
+    InboxNavItemHandler.prototype._handle = function (mutation) {
+        mutation.target.addEventListener("click", () => {
+            console.log("clicked: Inbox Nav Item");
+            alert('Try "g + i" to go to inbox.');
+        });
+        mutation.target.setAttribute('data-keys-is-listening', true);
+    }
+
 
     // UnhandledMutationHandler
     //
