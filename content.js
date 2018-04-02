@@ -59,17 +59,54 @@
         return new AlreadyListeningHandler(new RefreshButtonHandler(new SelectAllMenuItemHandler(new SelectNoneMenuItemHandler(new SelectReadMenuItemHandler(new SelectUnreadMenuItemHandler(new SelectStarredMenuItemHandler(new SelectUnstarredMenuItemHandler(new InboxNavItemHandler(new UnhandledMutationHandler())))))))));
     }
 
+    // ChainLink
+    //
+    // Abstraction for a single link in the Chain of Responsibility for DOM mutations.  To add a new link to the chain extend this 
+    // object by overriding _canHandle() and _handle().
+    //
+    // next
+    //   The next ChainLink in this Chain of Responsibility
+    function ChainLink(next) {
+        this.next = next;
+    }
+
+    ChainLink.prototype = {
+        next: undefined,
+
+        handle: function (mutation) {
+            if (this._canHandle(mutation)) {
+                this._handle(mutation);
+            } else {
+                if (this.next)
+                    this.next.handle(mutation);
+            }
+        },
+
+        _canHandle: function (mutation) {
+            return true;
+        },
+
+        _handle: function (mutation) {
+
+        }
+    }
+
     // AlreadyListeningHandler
     //
     // Checks to see if the mutated element is already being watched for clicks.  If it is, then no further processing is needed 
     // if it is not, then the mutation is passed to the next link in the handler chain.
     function AlreadyListeningHandler(next) {
-        this.next = next;
+        ChainLink.call(this, next);
+    }
+    
+    AlreadyListeningHandler.prototype = Object.create(ChainLink.prototype);
+
+    AlreadyListeningHandler.prototype._canHandle = function (mutation) {
+        return mutation.target.getAttribute('data-keys-is-listening');
     }
 
-    AlreadyListeningHandler.prototype.handle = function (mutation) {
-        if (!mutation.target.getAttribute('data-keys-is-listening'))
-            this.next.handle(mutation);
+    AlreadyListeningHandler.prototype._handle = function (mutation) {
+        // no-op to break the chain of responsibility
     }
 
     // RefreshButtonHandler
