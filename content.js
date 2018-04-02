@@ -34,6 +34,10 @@
         get selectUnstarredMenuItem() {
             return document.querySelector("[selector='unstarred'][role='menuitem']");
         },
+
+        get inboxNavItem() {
+            return document.querySelector("a[href$='#inbox'][title='Inbox']");
+        },
         
         isLoading: function () {
             return document.querySelector("#loading[style='display: none;']") === null;
@@ -52,7 +56,7 @@
     }
     
     MutationChainFactory.prototype.make = function () {
-        return new AlreadyListeningHandler(new RefreshButtonHandler(new SelectAllMenuItemHandler(new SelectNoneMenuItemHandler(new SelectReadMenuItemHandler(new SelectUnreadMenuItemHandler(new SelectStarredMenuItemHandler(new SelectUnstarredMenuItemHandler(new UnhandledMutationHandler()))))))));
+        return new AlreadyListeningHandler(new RefreshButtonHandler(new SelectAllMenuItemHandler(new SelectNoneMenuItemHandler(new SelectReadMenuItemHandler(new SelectUnreadMenuItemHandler(new SelectStarredMenuItemHandler(new SelectUnstarredMenuItemHandler(new InboxNavItemHandler(new UnhandledMutationHandler())))))))));
     }
 
     // AlreadyListeningHandler
@@ -224,6 +228,30 @@
                 alert('Try "* + t" to select all unstarred.');
             });
             mutation.target.setAttribute('data-keys-is-listening', true);
+        }
+    }
+
+    // InboxNavItemHandler
+    // 
+    // Checks to see if the mutated element is the Inbox navigation item.  If it is, then a click listener is added to the navigation item 
+    // and the 'data-keys-is-listening' attribute is set accordingly.  Otherwise, the mutation is passed to the next link in the 
+    // handler chain.
+    function InboxNavItemHandler(next) {
+        this.next = next;
+    }
+
+    InboxNavItemHandler.prototype = {
+        handle: function (mutation) {
+            let gmail = new Gmail();
+            if (mutation.target !== gmail.inboxNavItem) {
+                this.next.handle(mutation);
+            } else {
+                mutation.target.addEventListener("click", () => {
+                    console.log("clicked: Inbox Nav Item");
+                    alert('Try "g + i" to go to inbox.');
+                });
+                mutation.target.setAttribute('data-keys-is-listening', true);
+            }
         }
     }
 
