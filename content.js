@@ -64,7 +64,7 @@
         let selectNoneMenuItem = new SelectNoneMenuItemHandler(this._gmail, selectReadMenuItem);
         let selectAllMenuItem = new SelectAllMenuItemHandler(this._gmail, selectNoneMenuItem);
         let refreshButton = new RefreshButtonHandler(this._gmail, selectAllMenuItem);
-        return new AlreadyListeningHandler(this._gmail, refreshButton);
+        return new AlreadyListeningHandler(refreshButton);
     }
 
     // ChainLink
@@ -74,13 +74,11 @@
     //
     // next
     //   The next ChainLink in this Chain of Responsibility
-    function ChainLink(gmail, next) {
-        this._gmail = gmail;
+    function ChainLink(next) {
         this._next = next;
     }
 
     ChainLink.prototype = {
-        _gmail: undefined,
         _next: undefined,
 
         handle: function (mutation) {
@@ -105,8 +103,8 @@
     //
     // Checks to see if the mutated element is already being watched for clicks.  If it is, then no further processing is needed 
     // if it is not, then the mutation is passed to the next link in the handler chain.
-    function AlreadyListeningHandler(gmail, next) {
-        ChainLink.call(this, gmail, next);
+    function AlreadyListeningHandler(next) {
+        ChainLink.call(this, next);
     }
 
     AlreadyListeningHandler.prototype = Object.create(ChainLink.prototype);
@@ -125,7 +123,8 @@
     // 'data-keys-is-listening' attribute is set accordingly.  Otherwise, the mutation is passed to the next link in the handler 
     // chain.
     function RefreshButtonHandler(gmail, next) {
-        ChainLink.call(this, gmail, next);
+        ChainLink.call(this, next);
+        this._gmail = gmail;
     }
 
     RefreshButtonHandler.prototype = Object.create(ChainLink.prototype);
@@ -149,7 +148,8 @@
     // and the 'data-keys-is-listening' attribute is set accordingly.  Otherwise, the mutation is passed to the next link in the 
     // handler chain.
     function SelectAllMenuItemHandler(gmail, next) {
-        ChainLink.call(this, gmail, next);
+        ChainLink.call(this, next);
+        this._gmail = gmail;
     }
 
     SelectAllMenuItemHandler.prototype = Object.create(ChainLink.prototype);
@@ -173,7 +173,8 @@
     // and the 'data-keys-is-listening' attribute is set accordingly.  Otherwise, the mutation is passed to the next link in the 
     // handler chain.
     function SelectNoneMenuItemHandler(gmail, next) {
-        ChainLink.call(this, gmail, next);
+        ChainLink.call(this, next);
+        this._gmail = gmail;
     }
 
     SelectNoneMenuItemHandler.prototype = Object.create(ChainLink.prototype);
@@ -197,7 +198,8 @@
     // and the 'data-keys-is-listening' attribute is set accordingly.  Otherwise, the mutation is passed to the next link in the 
     // handler chain.
     function SelectReadMenuItemHandler(gmail, next) {
-        ChainLink.call(this, gmail, next);
+        ChainLink.call(this, next);
+        this._gmail = gmail;
     }
 
     SelectReadMenuItemHandler.prototype = Object.create(ChainLink.prototype);
@@ -221,7 +223,8 @@
     // and the 'data-keys-is-listening' attribute is set accordingly.  Otherwise, the mutation is passed to the next link in the 
     // handler chain.
     function SelectUnreadMenuItemHandler(gmail, next) {
-        ChainLink.call(this, gmail, next);
+        ChainLink.call(this, next);
+        this._gmail = gmail;
     }
 
     SelectUnreadMenuItemHandler.prototype = Object.create(ChainLink.prototype);
@@ -245,7 +248,8 @@
     // and the 'data-keys-is-listening' attribute is set accordingly.  Otherwise, the mutation is passed to the next link in the 
     // handler chain.
     function SelectStarredMenuItemHandler(gmail, next) {
-        ChainLink.call(this, gmail, next);
+        ChainLink.call(this, next);
+        this._gmail = gmail;
     }
 
     SelectStarredMenuItemHandler.prototype = Object.create(ChainLink.prototype);
@@ -269,7 +273,8 @@
     // and the 'data-keys-is-listening' attribute is set accordingly.  Otherwise, the mutation is passed to the next link in the 
     // handler chain.
     function SelectUnstarredMenuItemHandler(gmail, next) {
-        ChainLink.call(this, gmail, next);
+        ChainLink.call(this, next);
+        this._gmail = gmail;
     }
 
     SelectUnstarredMenuItemHandler.prototype = Object.create(ChainLink.prototype);
@@ -293,7 +298,8 @@
     // and the 'data-keys-is-listening' attribute is set accordingly.  Otherwise, the mutation is passed to the next link in the 
     // handler chain.
     function InboxNavItemHandler(gmail, next) {
-        ChainLink.call(this, gmail, next);
+        ChainLink.call(this, next);
+        this._gmail = gmail;
     }
 
     InboxNavItemHandler.prototype = Object.create(ChainLink.prototype);
