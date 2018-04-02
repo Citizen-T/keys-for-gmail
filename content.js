@@ -36,7 +36,7 @@
         },
 
         get inboxNavItem() {
-            return document.querySelector("a[href$='#inbox'][title='Inbox']");
+            return document.querySelector("a[href$='#inbox'][target='_top']");
         },
 
         isLoading: function () {
