@@ -38,7 +38,7 @@
         get inboxNavItem() {
             return document.querySelector("a[href$='#inbox'][title='Inbox']");
         },
-        
+
         isLoading: function () {
             return document.querySelector("#loading[style='display: none;']") === null;
         },
@@ -54,7 +54,7 @@
     function MutationChainFactory() {
 
     }
-    
+
     MutationChainFactory.prototype.make = function () {
         return new AlreadyListeningHandler(new RefreshButtonHandler(new SelectAllMenuItemHandler(new SelectNoneMenuItemHandler(new SelectReadMenuItemHandler(new SelectUnreadMenuItemHandler(new SelectStarredMenuItemHandler(new SelectUnstarredMenuItemHandler(new InboxNavItemHandler(new UnhandledMutationHandler())))))))));
     }
@@ -98,7 +98,7 @@
     function AlreadyListeningHandler(next) {
         ChainLink.call(this, next);
     }
-    
+
     AlreadyListeningHandler.prototype = Object.create(ChainLink.prototype);
 
     AlreadyListeningHandler.prototype._canHandle = function (mutation) {
@@ -115,21 +115,24 @@
     // 'data-keys-is-listening' attribute is set accordingly.  Otherwise, the mutation is passed to the next link in the handler 
     // chain.
     function RefreshButtonHandler(next) {
-        this.next = next;
+        ChainLink.call(this, next);
     }
 
-    RefreshButtonHandler.prototype.handle = function (mutation) {
+    RefreshButtonHandler.prototype = Object.create(ChainLink.prototype);
+
+    RefreshButtonHandler.prototype._canHandle = function (mutation) {
         let gmail = new Gmail();
-        if (mutation.target !== gmail.refreshButton) {
-            this.next.handle(mutation);
-        } else {
-            mutation.target.addEventListener("click", () => {
-                console.log("clicked: Refresh");
-                if (gmail.isViewingInbox())
-                    alert('Try "g + i" to refresh your inbox.');
-            });
-            mutation.target.setAttribute('data-keys-is-listening', true);
-        }
+        return mutation.target === gmail.refreshButton;
+    }
+
+    RefreshButtonHandler.prototype._handle = function (mutation) {
+        let gmail = new Gmail();
+        mutation.target.addEventListener("click", () => {
+            console.log("clicked: Refresh");
+            if (gmail.isViewingInbox())
+                alert('Try "g + i" to refresh your inbox.');
+        });
+        mutation.target.setAttribute('data-keys-is-listening', true);
     }
 
     // SelectAllMenuItemHandler
@@ -301,7 +304,7 @@
     }
 
     UnhandledMutationHandler.prototype.handle = function (mutation) {
-        
+
     }
 
     // main
