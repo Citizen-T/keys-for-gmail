@@ -3,7 +3,7 @@
     //
     // A kind of "page object" that encapsulates some of the features of the Gmail app in easy to read and understand methods.
     function Gmail() {
-
+        
     }
 
     Gmail.prototype = {
@@ -51,21 +51,20 @@
     // MutationChainFactory
     // 
     // Creates the mutation handler chain
-    function MutationChainFactory() {
-
+    function MutationChainFactory(gmail) {
+        this._gmail = gmail;
     }
 
     MutationChainFactory.prototype.make = function () {
-        let gmail = new Gmail();
-        let inboxNavItem = new InboxNavItemHandler(gmail);
-        let selectUnstarredMenuItem = new SelectUnstarredMenuItemHandler(gmail, inboxNavItem);
-        let selectStarredMenuItem = new SelectStarredMenuItemHandler(gmail, selectUnstarredMenuItem);
-        let selectUnreadmenuItem = new SelectUnreadMenuItemHandler(gmail, selectStarredMenuItem);
-        let selectReadMenuItem = new SelectReadMenuItemHandler(gmail, selectUnreadmenuItem);
-        let selectNoneMenuItem = new SelectNoneMenuItemHandler(gmail, selectReadMenuItem);
-        let selectAllMenuItem = new SelectAllMenuItemHandler(gmail, selectNoneMenuItem);
-        let refreshButton = new RefreshButtonHandler(gmail, selectAllMenuItem);
-        return new AlreadyListeningHandler(gmail, refreshButton);
+        let inboxNavItem = new InboxNavItemHandler(this._gmail);
+        let selectUnstarredMenuItem = new SelectUnstarredMenuItemHandler(this._gmail, inboxNavItem);
+        let selectStarredMenuItem = new SelectStarredMenuItemHandler(this._gmail, selectUnstarredMenuItem);
+        let selectUnreadmenuItem = new SelectUnreadMenuItemHandler(this._gmail, selectStarredMenuItem);
+        let selectReadMenuItem = new SelectReadMenuItemHandler(this._gmail, selectUnreadmenuItem);
+        let selectNoneMenuItem = new SelectNoneMenuItemHandler(this._gmail, selectReadMenuItem);
+        let selectAllMenuItem = new SelectAllMenuItemHandler(this._gmail, selectNoneMenuItem);
+        let refreshButton = new RefreshButtonHandler(this._gmail, selectAllMenuItem);
+        return new AlreadyListeningHandler(this._gmail, refreshButton);
     }
 
     // ChainLink
@@ -314,7 +313,7 @@
 
     // main
     let gmail = new Gmail();
-    let mutationChain = new MutationChainFactory().make();
+    let mutationChain = new MutationChainFactory(gmail).make();
     let observer = new MutationObserver((mutations) => {
         if (!gmail.isLoading())
             mutations.forEach((m) => mutationChain.handle(m));
