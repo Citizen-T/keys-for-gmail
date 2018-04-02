@@ -216,20 +216,22 @@
     // and the 'data-keys-is-listening' attribute is set accordingly.  Otherwise, the mutation is passed to the next link in the 
     // handler chain.
     function SelectUnreadMenuItemHandler(next) {
-        this.next = next;
+        ChainLink.call(this, next);
     }
 
-    SelectUnreadMenuItemHandler.prototype.handle = function (mutation) {
+    SelectUnreadMenuItemHandler.prototype = Object.create(ChainLink.prototype);
+
+    SelectUnreadMenuItemHandler.prototype._canHandle = function (mutation) {
         let gmail = new Gmail();
-        if (mutation.target !== gmail.selectUnreadMenuItem) {
-            this.next.handle(mutation);
-        } else {
-            mutation.target.addEventListener("click", () => {
-                console.log("clicked: Select Unread");
-                alert('Try "* + u" to select all unread.');
-            });
-            mutation.target.setAttribute('data-keys-is-listening', true);
-        }
+        return mutation.target === gmail.selectUnreadMenuItem;
+    }
+
+    SelectUnreadMenuItemHandler.prototype._handle = function (mutation) {
+        mutation.target.addEventListener("click", () => {
+            console.log("clicked: Select Unread");
+            alert('Try "* + u" to select all unread.');
+        });
+        mutation.target.setAttribute('data-keys-is-listening', true);
     }
 
 
