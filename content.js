@@ -184,27 +184,29 @@
         mutation.target.setAttribute('data-keys-is-listening', true);
     }
 
-    
+
     // SelectReadMenuItemHandler
     // 
     // Checks to see if the mutated element is the Select Read menu item.  If it is, then a click listener is added to the menu item 
     // and the 'data-keys-is-listening' attribute is set accordingly.  Otherwise, the mutation is passed to the next link in the 
     // handler chain.
     function SelectReadMenuItemHandler(next) {
-        this.next = next;
+        ChainLink.call(this, next);
     }
 
-    SelectReadMenuItemHandler.prototype.handle = function (mutation) {
+    SelectReadMenuItemHandler.prototype = Object.create(ChainLink.prototype);
+
+    SelectReadMenuItemHandler.prototype._canHandle = function (mutation) {
         let gmail = new Gmail();
-        if (mutation.target !== gmail.selectReadMenuItem) {
-            this.next.handle(mutation);
-        } else {
-            mutation.target.addEventListener("click", () => {
-                console.log("clicked: Select Read");
-                alert('Try "* + r" to select all read.');
-            });
-            mutation.target.setAttribute('data-keys-is-listening', true);
-        }
+        return mutation.target === gmail.selectReadMenuItem;
+    }
+
+    SelectReadMenuItemHandler.prototype._handle = function (mutation) {
+        mutation.target.addEventListener("click", () => {
+            console.log("clicked: Select Read");
+            alert('Try "* + r" to select all read.');
+        });
+        mutation.target.setAttribute('data-keys-is-listening', true);
     }
 
 
