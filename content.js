@@ -141,22 +141,24 @@
     // and the 'data-keys-is-listening' attribute is set accordingly.  Otherwise, the mutation is passed to the next link in the 
     // handler chain.
     function SelectAllMenuItemHandler(next) {
-        this.next = next;
+        ChainLink.call(this, next);
     }
 
-    SelectAllMenuItemHandler.prototype.handle = function (mutation) {
+    SelectAllMenuItemHandler.prototype = Object.create(ChainLink.prototype);
+
+    SelectAllMenuItemHandler.prototype._canHandle = function (mutation) {
         let gmail = new Gmail();
-        if (mutation.target !== gmail.selectAllMenuItem) {
-            this.next.handle(mutation);
-        } else {
-            mutation.target.addEventListener("click", () => {
-                console.log("clicked: Select All");
-                alert('Try "* + a" to select all.');
-            });
-            mutation.target.setAttribute('data-keys-is-listening', true);
-        }
+        return mutation.target === gmail.selectAllMenuItem
     }
 
+    SelectAllMenuItemHandler.prototype._handle = function (mutation) {
+        mutation.target.addEventListener("click", () => {
+            console.log("clicked: Select All");
+            alert('Try "* + a" to select all.');
+        });
+        mutation.target.setAttribute('data-keys-is-listening', true);
+    }
+    
 
     // SelectNoneMenuItemHandler
     //
