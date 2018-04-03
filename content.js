@@ -55,6 +55,10 @@
             return document.querySelector("a[href$='#drafts'][target='_top']");
         },
 
+        get allMailNavItem() {
+            return document.querySelector("a[href$='#all'][target='_top']");
+        },
+
         isLoading: function () {
             return document.querySelector("#loading[style='display: none;']") === null;
         },
@@ -77,7 +81,8 @@
         let starredNavItem = new StarredNavItemHandler(this._gmail, inboxNavItem);
         let sentMailNavItem = new SentMailNavItemHandler(this._gmail, starredNavItem);
         let draftsNavItem = new DraftsNavItemHandler(this._gmail, sentMailNavItem);
-        let selectUnstarredMenuItem = new SelectUnstarredMenuItemHandler(this._gmail, draftsNavItem);
+        let allMailNavItem = new AllMailNavItemHandler(this._gmail, draftsNavItem);
+        let selectUnstarredMenuItem = new SelectUnstarredMenuItemHandler(this._gmail, allMailNavItem);
         let selectStarredMenuItem = new SelectStarredMenuItemHandler(this._gmail, selectUnstarredMenuItem);
         let selectUnreadmenuItem = new SelectUnreadMenuItemHandler(this._gmail, selectStarredMenuItem);
         let selectReadMenuItem = new SelectReadMenuItemHandler(this._gmail, selectUnreadmenuItem);
@@ -394,6 +399,25 @@
     DraftsNavItemHandler.prototype._handle = function (mutation) {
         mutation.target.addEventListener("click", () => {
             alert('Try "g + d" to go to Drafts.');
+        });
+        mutation.target.setAttribute('data-keys-is-listening', true);
+    }
+
+    // AllMailNavItemHandler
+    function AllMailNavItemHandler(gmail, next) {
+        ChainLink.call(this, next);
+        this._gmail = gmail;
+    }
+
+    AllMailNavItemHandler.prototype = Object.create(ChainLink.prototype);
+
+    AllMailNavItemHandler.prototype._canHandle = function (mutation) {
+        return mutation.target === this._gmail.allMailNavItem;
+    }
+
+    AllMailNavItemHandler.prototype._handle = function (mutation) {
+        mutation.target.addEventListener("click", () => {
+            alert('Try "g + a" to go to All Mail.');
         });
         mutation.target.setAttribute('data-keys-is-listening', true);
     }
