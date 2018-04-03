@@ -7,8 +7,12 @@
     }
 
     Gmail.prototype = {
+        _composeButton: undefined,
+
         get composeButton() {
-            return document.evaluate("//*[@role='button' and text()='COMPOSE']", document, null, XPathResult.ANY_TYPE, null).iterateNext();
+            if (!this._composeButton)
+                this._composeButton = document.evaluate("//*[@role='button' and text()='COMPOSE']", document, null, XPathResult.ANY_TYPE, null).iterateNext();
+            return this._composeButton;
         },
         
         get refreshButton() {
