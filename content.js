@@ -67,6 +67,10 @@
             return document.querySelector("a[href$='#all'][target='_top']");
         },
 
+        get inboxSections() {
+            return document.querySelectorAll("table div[role='tab'][aria-label]");
+        },
+
         isLoading: function () {
             return document.querySelector("#loading[style='display: none;']") === null;
         },
@@ -97,7 +101,8 @@
         let selectReadMenuItem = new SelectReadMenuItemHandler(this._gmail, selectUnreadmenuItem);
         let selectNoneMenuItem = new SelectNoneMenuItemHandler(this._gmail, selectReadMenuItem);
         let selectAllMenuItem = new SelectAllMenuItemHandler(this._gmail, selectNoneMenuItem);
-        let refreshButton = new RefreshButtonHandler(this._gmail, selectAllMenuItem);
+        let inboxSections = new InboxSectionHandler(this._gmail, selectAllMenuItem);
+        let refreshButton = new RefreshButtonHandler(this._gmail, inboxSections);
         return new AlreadyListeningHandler(refreshButton);
     }
 
@@ -152,6 +157,10 @@
     }
 
     // ComposeButtonHandler
+    //
+    // Checks to see if the mutated element is the Compose button.  If it is, then a click listener is added to the button and the 
+    // 'data-keys-is-listening' attribute is set accordingly.  Otherwise, the mutation is passed to the next link in the handler 
+    // chain.
     function ComposeButtonHandler(gmail) {
         ChainLink.call(this);
         this._gmail = gmail;
@@ -468,6 +477,33 @@
             } else {
                 alert('Try "* + n" to select none.');
             }
+        });
+        mutation.target.setAttribute('data-keys-is-listening', true);
+    }
+
+    // InboxSectionHandler
+    //
+    // Checks to see if the mutated element is one of the inbox sections.  If it is, then a click listener is added to the section 
+    // and the 'data-keys-is-listening' attribute is set accordingly.  Otherwise, the mutation is passed to the next link in the 
+    // handler chain.
+    function InboxSectionHandler(gmail, next) {
+        ChainLink.call(this, next);
+        this._gmail = gmail;
+    }
+
+    InboxSectionHandler.prototype = Object.create(ChainLink.prototype);
+
+    InboxSectionHandler.prototype._canHandle = function (mutation) {
+        for (let section of this._gmail.inboxSections) {
+            if (mutation.target === section)
+                return true;
+        }
+        return false;
+    }
+
+    InboxSectionHandler.prototype._handle = function (mutation) {
+        mutation.target.addEventListener("click", () => {
+            alert('Try "`" to cycle through inbox sections.');
         });
         mutation.target.setAttribute('data-keys-is-listening', true);
     }
