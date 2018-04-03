@@ -19,6 +19,10 @@
             return document.querySelector("[role='button'][data-tooltip='Refresh']");
         },
 
+        get backToButton() {
+            return document.querySelector("[role='button'][data-tooltip^='Back to ']");
+        },
+
         get selectAllCheckbox() {
             return document.querySelector("div[data-rowlist-toolbar='true'] span[role='checkbox']");
         },
@@ -89,7 +93,8 @@
 
     MutationChainFactory.prototype.make = function () {
         let composeButton = new ComposeButtonHandler(this._gmail);
-        let selectAllCheckbox = new SelectAllCheckboxHandler(this._gmail, composeButton);
+        let backToButton = new BackToButtonHandler(this._gmail, composeButton);
+        let selectAllCheckbox = new SelectAllCheckboxHandler(this._gmail, backToButton);
         let inboxNavItem = new InboxNavItemHandler(this._gmail, selectAllCheckbox);
         let starredNavItem = new StarredNavItemHandler(this._gmail, inboxNavItem);
         let sentMailNavItem = new SentMailNavItemHandler(this._gmail, starredNavItem);
@@ -175,6 +180,29 @@
     ComposeButtonHandler.prototype._handle = function (mutation) {
         mutation.target.addEventListener("click", () => {
             alert('Try "c" to compose a new message.');
+        });
+        mutation.target.setAttribute('data-keys-is-listening', true);
+    }
+
+    // BackToButtonHandler
+    //
+    // Checks to see if the mutated element is the Back To button.  If it is, then a click listener is added to the button and the 
+    // 'data-keys-is-listening' attribute is set accordingly.  Otherwise, the mutation is passed to the next link in the handler 
+    // chain.
+    function BackToButtonHandler(gmail, next) {
+        ChainLink.call(this, next);
+        this._gmail = gmail;
+    }
+
+    BackToButtonHandler.prototype = Object.create(ChainLink.prototype);
+
+    BackToButtonHandler.prototype._canHandle = function (mutation) {
+        return mutation.target === this._gmail.backToButton;
+    }
+
+    BackToButtonHandler.prototype._handle = function (mutation) {
+        mutation.target.addEventListener("click", () => {
+            alert('Try "n" to go back to the thread list.');
         });
         mutation.target.setAttribute('data-keys-is-listening', true);
     }
