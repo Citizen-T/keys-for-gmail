@@ -51,6 +51,10 @@
             return document.querySelector("a[href$='#sent'][target='_top']");
         },
 
+        get draftsNavItem() {
+            return document.querySelector("a[href$='#drafts'][target='_top']");
+        },
+
         isLoading: function () {
             return document.querySelector("#loading[style='display: none;']") === null;
         },
@@ -72,7 +76,8 @@
         let inboxNavItem = new InboxNavItemHandler(this._gmail, selectAllCheckbox);
         let starredNavItem = new StarredNavItemHandler(this._gmail, inboxNavItem);
         let sentMailNavItem = new SentMailNavItemHandler(this._gmail, starredNavItem);
-        let selectUnstarredMenuItem = new SelectUnstarredMenuItemHandler(this._gmail, sentMailNavItem);
+        let draftsNavItem = new DraftsNavItemHandler(this._gmail, sentMailNavItem);
+        let selectUnstarredMenuItem = new SelectUnstarredMenuItemHandler(this._gmail, draftsNavItem);
         let selectStarredMenuItem = new SelectStarredMenuItemHandler(this._gmail, selectUnstarredMenuItem);
         let selectUnreadmenuItem = new SelectUnreadMenuItemHandler(this._gmail, selectStarredMenuItem);
         let selectReadMenuItem = new SelectReadMenuItemHandler(this._gmail, selectUnreadmenuItem);
@@ -366,6 +371,29 @@
     SentMailNavItemHandler.prototype._handle = function (mutation) {
         mutation.target.addEventListener("click", () => {
             alert('Try "g + t" to go to Sent Mail.');
+        });
+        mutation.target.setAttribute('data-keys-is-listening', true);
+    }
+
+    // DraftsNavItemHandler
+    //
+    // Checks to see if the mutated element is the Drafts navigation item.  If it is, then a click listener is added to the navigation item 
+    // and the 'data-keys-is-listening' attribute is set accordingly.  Otherwise, the mutation is passed to the next link in the 
+    // handler chain.
+    function DraftsNavItemHandler(gmail, next) {
+        ChainLink.call(this, next);
+        this._gmail = gmail;
+    }
+
+    DraftsNavItemHandler.prototype = Object.create(ChainLink.prototype);
+
+    DraftsNavItemHandler.prototype._canHandle = function (mutation) {
+        return mutation.target === this._gmail.draftsNavItem;
+    }
+
+    DraftsNavItemHandler.prototype._handle = function (mutation) {
+        mutation.target.addEventListener("click", () => {
+            alert('Try "g + d" to go to Drafts.');
         });
         mutation.target.setAttribute('data-keys-is-listening', true);
     }
