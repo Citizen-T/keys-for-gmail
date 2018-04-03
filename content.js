@@ -43,6 +43,10 @@
             return document.querySelector("a[href$='#inbox'][target='_top']");
         },
 
+        get starredNavItem() {
+            return document.querySelector("a[href$='#starred'][target='_top']");
+        },
+
         isLoading: function () {
             return document.querySelector("#loading[style='display: none;']") === null;
         },
@@ -62,7 +66,8 @@
     MutationChainFactory.prototype.make = function () {
         let selectAllCheckbox = new SelectAllCheckboxHandler(this._gmail);
         let inboxNavItem = new InboxNavItemHandler(this._gmail, selectAllCheckbox);
-        let selectUnstarredMenuItem = new SelectUnstarredMenuItemHandler(this._gmail, inboxNavItem);
+        let starredNavItem = new StarredNavItemHandler(this._gmail, inboxNavItem);
+        let selectUnstarredMenuItem = new SelectUnstarredMenuItemHandler(this._gmail, starredNavItem);
         let selectStarredMenuItem = new SelectStarredMenuItemHandler(this._gmail, selectUnstarredMenuItem);
         let selectUnreadmenuItem = new SelectUnreadMenuItemHandler(this._gmail, selectStarredMenuItem);
         let selectReadMenuItem = new SelectReadMenuItemHandler(this._gmail, selectUnreadmenuItem);
@@ -309,6 +314,30 @@
     InboxNavItemHandler.prototype._handle = function (mutation) {
         mutation.target.addEventListener("click", () => {
             alert('Try "g + i" to go to inbox.');
+        });
+        mutation.target.setAttribute('data-keys-is-listening', true);
+    }
+
+    
+    // StarredNavItemHandler
+    //
+    // Checks to see if the mutated element is the Starred navigation item.  If it is, then a click listener is added to the navigation item 
+    // and the 'data-keys-is-listening' attribute is set accordingly.  Otherwise, the mutation is passed to the next link in the 
+    // handler chain.
+    function StarredNavItemHandler(gmail, next) {
+        ChainLink.call(this, next);
+        this._gmail = gmail;
+    }
+
+    StarredNavItemHandler.prototype = Object.create(ChainLink.prototype);
+
+    StarredNavItemHandler.prototype._canHandle = function (mutation) {
+        return mutation.target === this._gmail.starredNavItem;
+    }
+
+    StarredNavItemHandler.prototype._handle = function (mutation) {
+        mutation.target.addEventListener("click", () => {
+            alert('Try "g + s" to go to Starred items.');
         });
         mutation.target.setAttribute('data-keys-is-listening', true);
     }
