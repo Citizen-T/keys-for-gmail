@@ -265,7 +265,6 @@
         mutation.target.setAttribute('data-keys-is-listening', true);
     }
 
-
     // SelectUnreadMenuItemHandler
     // 
     // Checks to see if the mutated element is the Select Unread menu item.  If it is, then a click listener is added to the menu item 
@@ -288,7 +287,6 @@
         });
         mutation.target.setAttribute('data-keys-is-listening', true);
     }
-
 
     // SelectStarredMenuItemHandler
     //
@@ -313,7 +311,6 @@
         mutation.target.setAttribute('data-keys-is-listening', true);
     }
 
-
     // SelectUnstarredMenuItemHandler
     //
     // Checks to see if the mutated element is the Select Unstarred menu item.  If it is, then a click listener is added to the menu item 
@@ -337,7 +334,6 @@
         mutation.target.setAttribute('data-keys-is-listening', true);
     }
 
-
     // InboxNavItemHandler
     // 
     // Checks to see if the mutated element is the Inbox navigation item.  If it is, then a click listener is added to the navigation item 
@@ -360,7 +356,6 @@
         });
         mutation.target.setAttribute('data-keys-is-listening', true);
     }
-
 
     // StarredNavItemHandler
     //
@@ -450,7 +445,6 @@
         mutation.target.setAttribute('data-keys-is-listening', true);
     }
 
-
     // SelectAllCheckboxHandler
     //
     // Checks to see if the mutated element is the Select All checkbox.  If it is, then a click listener is added to the checkbox 
@@ -477,7 +471,6 @@
         });
         mutation.target.setAttribute('data-keys-is-listening', true);
     }
-
 
     // main
     let gmail = new Gmail();
