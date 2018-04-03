@@ -7,6 +7,10 @@
     }
 
     Gmail.prototype = {
+        get composeButton() {
+            return document.evaluate("//*[@role='button' and text()='COMPOSE']", document, null, XPathResult.ANY_TYPE, null).iterateNext();
+        },
+        
         get refreshButton() {
             return document.querySelector("[role='button'][data-tooltip='Refresh']");
         },
@@ -76,7 +80,8 @@
     }
 
     MutationChainFactory.prototype.make = function () {
-        let selectAllCheckbox = new SelectAllCheckboxHandler(this._gmail);
+        let composeButton = new ComposeButtonHandler(this._gmail);
+        let selectAllCheckbox = new SelectAllCheckboxHandler(this._gmail, composeButton);
         let inboxNavItem = new InboxNavItemHandler(this._gmail, selectAllCheckbox);
         let starredNavItem = new StarredNavItemHandler(this._gmail, inboxNavItem);
         let sentMailNavItem = new SentMailNavItemHandler(this._gmail, starredNavItem);
@@ -140,6 +145,25 @@
 
     AlreadyListeningHandler.prototype._handle = function (mutation) {
         // no-op to break the chain of responsibility
+    }
+
+    // ComposeButtonHandler
+    function ComposeButtonHandler(gmail) {
+        ChainLink.call(this);
+        this._gmail = gmail;
+    }
+
+    ComposeButtonHandler.prototype = Object.create(ChainLink.prototype);
+
+    ComposeButtonHandler.prototype._canHandle = function (mutation) {
+        return mutation.target === this._gmail.composeButton;
+    }
+
+    ComposeButtonHandler.prototype._handle = function (mutation) {
+        mutation.target.addEventListener("click", () => {
+            alert('Try "c" to compose a new message.');
+        });
+        mutation.target.setAttribute('data-keys-is-listening', true);
     }
 
     // RefreshButtonHandler
