@@ -14,6 +14,10 @@
                 this._composeButton = document.evaluate("//*[@role='button' and text()='COMPOSE']", document, null, XPathResult.ANY_TYPE, null).iterateNext();
             return this._composeButton;
         },
+
+        get composeEditorCloseButton() {
+            return document.querySelector("img[src^='images/cleardot.gif'][data-tooltip='Save & Close']");
+        },
         
         get refreshButton() {
             return document.querySelector("[role='button'][data-tooltip='Refresh']");
@@ -93,7 +97,8 @@
 
     MutationChainFactory.prototype.make = function () {
         let composeButton = new ComposeButtonHandler(this._gmail);
-        let backToButton = new BackToButtonHandler(this._gmail, composeButton);
+        let composeCloseButton = new ComposeEditorCloseButton(this._gmail, composeButton);
+        let backToButton = new BackToButtonHandler(this._gmail, composeCloseButton);
         let selectAllCheckbox = new SelectAllCheckboxHandler(this._gmail, backToButton);
         let inboxNavItem = new InboxNavItemHandler(this._gmail, selectAllCheckbox);
         let starredNavItem = new StarredNavItemHandler(this._gmail, inboxNavItem);
@@ -180,6 +185,31 @@
     ComposeButtonHandler.prototype._handle = function (mutation) {
         mutation.target.addEventListener("click", () => {
             alert('Try "c" to compose a new message.');
+        });
+        mutation.target.setAttribute('data-keys-is-listening', true);
+    }
+
+    // ComposeEditorCloseButton
+    //
+    // Checks to see if the mutated element is the Compose Editor's close button.  If it is, then a click listener is added to the button and the 
+    // 'data-keys-is-listening' attribute is set accordingly.  Otherwise, the mutation is passed to the next link in the handler 
+    // chain.
+    function ComposeEditorCloseButton(gmail, next) {
+        ChainLink.call(this, next);
+        this._gmail = gmail;
+    }
+
+    ComposeEditorCloseButton.prototype = Object.create(ChainLink.prototype);
+
+    ComposeEditorCloseButton.prototype._canHandle = function (mutation) {
+        return mutation.target === this._gmail.composeEditorCloseButton;
+    }
+
+    ComposeEditorCloseButton.prototype._handle = function (mutation) {
+        // For some reason the 'click' event is not working for this element.  Trial and error has 
+        // made me think that the 'mouseup' event is the next best option.
+        mutation.target.addEventListener("mouseup", () => {
+            alert('Try "ESC" to close the Compose Editor.');
         });
         mutation.target.setAttribute('data-keys-is-listening', true);
     }
