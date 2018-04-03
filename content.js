@@ -47,6 +47,10 @@
             return document.querySelector("a[href$='#starred'][target='_top']");
         },
 
+        get sentMailNavItem() {
+            return document.querySelector("a[href$='#sent'][target='_top']");
+        },
+
         isLoading: function () {
             return document.querySelector("#loading[style='display: none;']") === null;
         },
@@ -67,7 +71,8 @@
         let selectAllCheckbox = new SelectAllCheckboxHandler(this._gmail);
         let inboxNavItem = new InboxNavItemHandler(this._gmail, selectAllCheckbox);
         let starredNavItem = new StarredNavItemHandler(this._gmail, inboxNavItem);
-        let selectUnstarredMenuItem = new SelectUnstarredMenuItemHandler(this._gmail, starredNavItem);
+        let sentMailNavItem = new SentMailNavItemHandler(this._gmail, starredNavItem);
+        let selectUnstarredMenuItem = new SelectUnstarredMenuItemHandler(this._gmail, sentMailNavItem);
         let selectStarredMenuItem = new SelectStarredMenuItemHandler(this._gmail, selectUnstarredMenuItem);
         let selectUnreadmenuItem = new SelectUnreadMenuItemHandler(this._gmail, selectStarredMenuItem);
         let selectReadMenuItem = new SelectReadMenuItemHandler(this._gmail, selectUnreadmenuItem);
@@ -318,7 +323,7 @@
         mutation.target.setAttribute('data-keys-is-listening', true);
     }
 
-    
+
     // StarredNavItemHandler
     //
     // Checks to see if the mutated element is the Starred navigation item.  If it is, then a click listener is added to the navigation item 
@@ -338,6 +343,29 @@
     StarredNavItemHandler.prototype._handle = function (mutation) {
         mutation.target.addEventListener("click", () => {
             alert('Try "g + s" to go to Starred items.');
+        });
+        mutation.target.setAttribute('data-keys-is-listening', true);
+    }
+
+    // SentMailNavItemHandler
+    //
+    // Checks to see if the mutated element is the Sent Mail navigation item.  If it is, then a click listener is added to the navigation item 
+    // and the 'data-keys-is-listening' attribute is set accordingly.  Otherwise, the mutation is passed to the next link in the 
+    // handler chain.
+    function SentMailNavItemHandler(gmail, next) {
+        ChainLink.call(this, next);
+        this._gmail = gmail;
+    }
+
+    SentMailNavItemHandler.prototype = Object.create(ChainLink.prototype);
+
+    SentMailNavItemHandler.prototype._canHandle = function (mutation) {
+        return mutation.target === this._gmail.sentMailNavItem;
+    }
+
+    SentMailNavItemHandler.prototype._handle = function (mutation) {
+        mutation.target.addEventListener("click", () => {
+            alert('Try "g + t" to go to Sent Mail.');
         });
         mutation.target.setAttribute('data-keys-is-listening', true);
     }
