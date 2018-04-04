@@ -8,6 +8,7 @@
 
     Gmail.prototype = {
         _composeButton: undefined,
+        _markAsReadButtons: [],
 
         get composeButton() {
             if (!this._composeButton)
@@ -25,6 +26,18 @@
 
         get backToButton() {
             return document.querySelector("[role='button'][data-tooltip^='Back to ']");
+        },
+
+        get markAsReadButtons() {
+            if (this._markAsReadButtons.length === 0) {
+                let iter = document.evaluate("//div[@role='button' and div/text()='Mark as read']", document, null, XPathResult.ANY_TYPE, null);
+                let result = iter.iterateNext();
+                while (result) {
+                    this._markAsReadButtons.push(result);
+                    result = iter.iterateNext();
+                }
+            }
+            return this._markAsReadButtons;
         },
 
         get selectAllCheckbox() {
@@ -99,7 +112,8 @@
         let composeButton = new ComposeButtonHandler(this._gmail);
         let composeCloseButton = new ComposeEditorCloseButton(this._gmail, composeButton);
         let backToButton = new BackToButtonHandler(this._gmail, composeCloseButton);
-        let selectAllCheckbox = new SelectAllCheckboxHandler(this._gmail, backToButton);
+        let markAsReadButton = new MarkAsReadButtonHandler(this._gmail, backToButton);
+        let selectAllCheckbox = new SelectAllCheckboxHandler(this._gmail, markAsReadButton);
         let inboxNavItem = new InboxNavItemHandler(this._gmail, selectAllCheckbox);
         let starredNavItem = new StarredNavItemHandler(this._gmail, inboxNavItem);
         let sentMailNavItem = new SentMailNavItemHandler(this._gmail, starredNavItem);
@@ -257,6 +271,29 @@
         mutation.target.addEventListener("click", () => {
             if (this._gmail.isViewingInbox())
                 alert('Try "g + i" to refresh your inbox.');
+        });
+        mutation.target.setAttribute('data-keys-is-listening', true);
+    }
+
+    // MarkAsReadButtonHandler
+    // 
+    // Checks to see if the mutated element is the Mark as Read button.  If it is, then a click listener is added to the button and the 
+    // 'data-keys-is-listening' attribute is set accordingly.  Otherwise, the mutation is passed to the next link in the handler 
+    // chain.
+    function MarkAsReadButtonHandler(gmail, next) {
+        ChainLink.call(this, next);
+        this._gmail = gmail;
+    }
+
+    MarkAsReadButtonHandler.prototype = Object.create(ChainLink.prototype);
+
+    MarkAsReadButtonHandler.prototype._canHandle = function (mutation) {
+        return this._gmail.markAsReadButtons.includes(mutation.target);
+    }
+
+    MarkAsReadButtonHandler.prototype._handle = function (mutation) {
+        mutation.target.addEventListener("click", () => {
+            alert('Try "shift + i" to mark as read.');
         });
         mutation.target.setAttribute('data-keys-is-listening', true);
     }
