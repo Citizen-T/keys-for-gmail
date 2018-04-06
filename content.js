@@ -19,6 +19,10 @@
         get composeEditorCloseButton() {
             return document.querySelector("img[src^='images/cleardot.gif'][data-tooltip='Save & Close']");
         },
+
+        get composeEditorSendButton() {
+            return document.evaluate("//div[@role='button' and text()='Send']", document, null, XPathResult.ANY_TYPE, null).iterateNext();
+        },
         
         get refreshButton() {
             return document.querySelector("[role='button'][data-tooltip='Refresh']");
@@ -111,7 +115,8 @@
     MutationChainFactory.prototype.make = function () {
         let composeButton = new ComposeButtonHandler(this._gmail);
         let composeCloseButton = new ComposeEditorCloseButton(this._gmail, composeButton);
-        let backToButton = new BackToButtonHandler(this._gmail, composeCloseButton);
+        let composeSendButton = new ComposeSendButtonHandler(this._gmail, composeCloseButton);
+        let backToButton = new BackToButtonHandler(this._gmail, composeSendButton);
         let markAsReadButton = new MarkAsReadButtonHandler(this._gmail, backToButton);
         let selectAllCheckbox = new SelectAllCheckboxHandler(this._gmail, markAsReadButton);
         let inboxNavItem = new InboxNavItemHandler(this._gmail, selectAllCheckbox);
@@ -224,6 +229,29 @@
         // made me think that the 'mouseup' event is the next best option.
         mutation.target.addEventListener("mouseup", () => {
             alert('Try "ESC" to close the Compose Editor.');
+        });
+        mutation.target.setAttribute('data-keys-is-listening', true);
+    }
+
+    // ComposeSendButtonHandler
+    //
+    // Checks to see if the mutated element is the Compose Editor's send button.  If it is, then a click listener is added to the button and the 
+    // 'data-keys-is-listening' attribute is set accordingly.  Otherwise, the mutation is passed to the next link in the handler 
+    // chain.
+    function ComposeSendButtonHandler(gmail, next) {
+        ChainLink.call(this, next);
+        this._gmail = gmail;
+    }
+
+    ComposeSendButtonHandler.prototype = Object.create(ChainLink.prototype);
+
+    ComposeSendButtonHandler.prototype._canHandle = function (mutation) {
+        return mutation.target === this._gmail.composeEditorSendButton;
+    }
+
+    ComposeSendButtonHandler.prototype._handle = function (mutation) {
+        mutation.target.addEventListener("click", () => {
+            alert('Try "Cmd + Enter" to send a message.');
         });
         mutation.target.setAttribute('data-keys-is-listening', true);
     }
