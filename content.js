@@ -20,6 +20,10 @@
             return document.querySelector("img[src^='images/cleardot.gif'][data-tooltip='Save & Close']");
         },
 
+        get composeEditorBccLink() {
+            return document.evaluate("//span[@role='link' and text()='Bcc']", document, null, XPathResult.ANY_TYPE, null).iterateNext();
+        },
+
         get composeEditorSendButton() {
             return document.evaluate("//div[@role='button' and text()='Send']", document, null, XPathResult.ANY_TYPE, null).iterateNext();
         },
@@ -115,7 +119,8 @@
     MutationChainFactory.prototype.make = function () {
         let composeButton = new ComposeButtonHandler(this._gmail);
         let composeCloseButton = new ComposeEditorCloseButton(this._gmail, composeButton);
-        let composeSendButton = new ComposeSendButtonHandler(this._gmail, composeCloseButton);
+        let composeBccButton = new ComposeEditorBccButtonHandler(this._gmail, composeCloseButton);
+        let composeSendButton = new ComposeSendButtonHandler(this._gmail, composeBccButton);
         let backToButton = new BackToButtonHandler(this._gmail, composeSendButton);
         let markAsReadButton = new MarkAsReadButtonHandler(this._gmail, backToButton);
         let selectAllCheckbox = new SelectAllCheckboxHandler(this._gmail, markAsReadButton);
@@ -229,6 +234,27 @@
         // made me think that the 'mouseup' event is the next best option.
         mutation.target.addEventListener("mouseup", () => {
             alert('Try "ESC" to close the Compose Editor.');
+        });
+        mutation.target.setAttribute('data-keys-is-listening', true);
+    }
+
+    // ComposeEditorBccButtonHandler
+    //
+    // 
+    function ComposeEditorBccButtonHandler(gmail, next) {
+        ChainLink.call(this, next);
+        this._gmail = gmail;
+    }
+
+    ComposeEditorBccButtonHandler.prototype = Object.create(ChainLink.prototype);
+
+    ComposeEditorBccButtonHandler.prototype._canHandle = function (mutation) {
+        return mutation.target === this._gmail.composeEditorBccLink;
+    }
+
+    ComposeEditorBccButtonHandler.prototype._handle = function (mutation) {
+        mutation.target.addEventListener("click", () => {
+            alert('Try "Cmd + Shift + b" to add a Bcc recipient.');
         });
         mutation.target.setAttribute('data-keys-is-listening', true);
     }
