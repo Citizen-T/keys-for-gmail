@@ -124,8 +124,8 @@
         let composeButton = new ComposeButtonHandler(this._gmail);
         let composeCloseButton = new ComposeEditorCloseButton(this._gmail, composeButton);
         let composeCcLink = new ComposeEditorCcLinkHandler(this._gmail, composeCloseButton);
-        let composeBccButton = new ComposeEditorBccButtonHandler(this._gmail, composeCcLink);
-        let composeSendButton = new ComposeSendButtonHandler(this._gmail, composeBccButton);
+        let composeBccLink = new ComposeEditorBccLinkHandler(this._gmail, composeCcLink);
+        let composeSendButton = new ComposeSendButtonHandler(this._gmail, composeBccLink);
         let backToButton = new BackToButtonHandler(this._gmail, composeSendButton);
         let markAsReadButton = new MarkAsReadButtonHandler(this._gmail, backToButton);
         let selectAllCheckbox = new SelectAllCheckboxHandler(this._gmail, markAsReadButton);
@@ -245,7 +245,8 @@
 
     // ComposeEditorCcLinkHandler
     //
-    // 
+    // Checks to see if the mutated element is the Compose Editor's Cc link.  If it is, then a click listener is added to the link and the 
+    // 'data-keys-is-listening' attribute is set accordingly.  Otherwise, the mutation is passed to the next link in the handler 
     function ComposeEditorCcLinkHandler(gmail, next) {
         ChainLink.call(this, next);
         this._gmail = gmail;
@@ -266,19 +267,20 @@
 
     // ComposeEditorBccButtonHandler
     //
-    // 
-    function ComposeEditorBccButtonHandler(gmail, next) {
+    // Checks to see if the mutated element is the Compose Editor's Bcc link.  If it is, then a click listener is added to the link and the 
+    // 'data-keys-is-listening' attribute is set accordingly.  Otherwise, the mutation is passed to the next link in the handler 
+    function ComposeEditorBccLinkHandler(gmail, next) {
         ChainLink.call(this, next);
         this._gmail = gmail;
     }
 
-    ComposeEditorBccButtonHandler.prototype = Object.create(ChainLink.prototype);
+    ComposeEditorBccLinkHandler.prototype = Object.create(ChainLink.prototype);
 
-    ComposeEditorBccButtonHandler.prototype._canHandle = function (mutation) {
+    ComposeEditorBccLinkHandler.prototype._canHandle = function (mutation) {
         return mutation.target === this._gmail.composeEditorBccLink;
     }
 
-    ComposeEditorBccButtonHandler.prototype._handle = function (mutation) {
+    ComposeEditorBccLinkHandler.prototype._handle = function (mutation) {
         mutation.target.addEventListener("click", () => {
             alert('Try "Cmd + Shift + b" to add a Bcc recipient.');
         });
